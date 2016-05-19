@@ -1,4 +1,6 @@
 var UMLClassID = 0;
+var UMLClasses = {};
+
 var UMLClass = function(config){
 	var className = config.classname;
 	if(className == null || className == undefined || className == "")
@@ -20,14 +22,14 @@ var UMLClass = function(config){
 		config.relationships = [];
 	}
 
-	if(config.top == undefined)
+	if(config.x == undefined)
 	{
-		config.top = $("#parent").height()/2;
+		config.x = 100;
 	}
 
-	if(config.left == undefined)
+	if(config.y == undefined)
 	{
-		config.left = $("#parent").width()/2;
+		config.y = 100;
 	}
 	this.className = className;
 	this.attributes = config.attributes;
@@ -36,6 +38,9 @@ var UMLClass = function(config){
 	this.id = UMLClassID++;
 	this.top = config.top;
 	this.left = config.left;
+	this.x = config.x;
+	this.y = config.y;
+	UMLClasses["class_"+this.id] = this;
 	this.render();
 };
 
@@ -45,98 +50,42 @@ UMLClass.prototype = {
 	attributes: [],
 	functions: [],
 	relationships: [],
-	parent: null,
-	top: null,
-	left: null,
+	x: 0,
+	y: 0,
 	render: function(){
+		var y = 0;
+		var x = 0;
+		var nameHeight = 30;
+		var attributesHeight = this.attributes.length * 15 + 10;
+		var functionsHeight = this.functions.length * 15 + 10;
+		
+		$("#class_"+this.id+"_parent").remove();
 
-		var parent = $("#parent");
-
-
-		var html = "<div class='umlclass' id='umlclass-"+this.id+"' style='top: "+this.top+"px !important; left:"+this.left+"px !important; position: absolute; z-index: 1000'>";
-
-			html += "<div class='umlclass-name'>";
-				html += this.className;
-			html += "</div>";
-
-			var striped = true;
-
-			html += "<div class='umlclass-attributes'>";
-				html += "<ul>";
+		var uml = '<svg id="class_'+this.id+'_parent">'+
+			'<g class="umlclass" transform="matrix(1 0 0 1 '+this.x+' '+this.y+')" id="class_'+this.id+'">'+
+				'<g>'+
+					'<rect class="umlclass-name-rect" x="'+x+'" y="'+y+'" width="200" height="'+nameHeight+'" ></rect>'+
+					'<rect class="umlclass-attributes-rect" x="'+x+'" y="'+(y+nameHeight)+'" width="200" height="'+attributesHeight+'"/></rect>'+
+					'<rect class="umlclass-functions-rect" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="200" height="'+functionsHeight+'"/></rect>'+
+				'</g>'+
+				'<g>'+
+					'<text class="umlclass-name-text" x="'+(x+100)+'" y="'+(y+15)+'">'+this.className+'</text>';
+					y += nameHeight+15;
 					$.each(this.attributes, function(key, attribute){
-						if(!striped)
-							html += "<li>"+attribute+"</li>";
-						else
-							html += "<li class='striped'>"+attribute+"</li>";
-
-						striped = !striped;
-					});
-				html += "</ul>"
-			html += "</div>";
-
-			html += "<div class='umlclass-functions'>";
-				html += "<ul>";
+						uml += '<text class="umlclass-attributes-text" x="'+(x+5)+'" y="'+y+'">'+attribute+'</text>';
+						y+=15;
+					})
+					y+=10;
 					$.each(this.functions, function(key, func){
-						if(!striped)
-							html += "<li>"+func+"</li>";
-						else
-							html += "<li class='striped'>"+func+"</li>";
+						uml += '<text class="umlclass-functions-text" x="'+(x+5)+'" y="'+y+'">'+func+'</text>';
+						y+=15;
+					})
+				'</g>'+
+			'</g>'+
+		'</svg>';
 
-						striped = !striped;
-					});
-				html += "</ul>"
-			html += "</div>";
-
-		html += "</div>";
-
-		parent.append(html);
-		this.bind();
+		$(".umlcanvas").append(uml);
 	},
-	bind: function(){
-		var umlThis = this;
-		var umlObject = $("#umlclass-"+umlThis.id);
-		umlObject.unbind();
-		umlObject.css("position", "relative");
-		var title = umlObject.find(".umlclass-name");
-
-		title.on("dblclick", function(){
-			if(title.data("edit") == 1)
-			{
-				title.data("edit", 0);
-				var newClassName = $("#umlclass-"+umlThis.id+"_title_edit").val();
-				if(newClassName != "")
-				{
-					umlThis.className = newClassName;
-					title.html(newClassName);
-				}else{
-					title.html(umlThis.className);
-				}
-			}else{
-				var textbox = "<input type='text' id='umlclass-"+umlThis.id+"_title_edit' value='"+umlThis.className+"'/>";
-				title.html(textbox);
-				var $textbox = $("#umlclass-"+umlThis.id+"_title_edit");
-				$textbox.focus();
-				$textbox.val($textbox.val());
-				$textbox.on("change blur", function(){
-					title.data("edit", 1);
-					title.dblclick();
-				});
-			}
-		});
-
-		umlObject.draggable({
-			containment: ".parent-container",
-			start: function(){
-				umlObject.css("z-index", 1000);
-			},
-			stop: function(){
-				umlObject.css("z-index", 500);
-			}
-		});
-
-	},
-	title: function(){
-		return $("#umlclass-"+this.id).find(".umlclass-name");
+	destroy: function(){
 	}
-
 }
