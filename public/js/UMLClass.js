@@ -87,5 +87,7 @@ UMLClass.prototype = {
 		$(".umlcanvas").append(uml);
 	},
 	destroy: function(){
+		$("#class_"+this.id+"_parent").remove();
+		delete UMLClasses["class_"+this.id];
 	}
 }

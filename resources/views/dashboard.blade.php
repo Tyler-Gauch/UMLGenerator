@@ -13,7 +13,7 @@
 			height: 5000px;
 		}
 		.umlclass{
-			border: 1px solid;
+			border: 5px solid;
 			display: inline-block;
 			border-radius: 10px;
 			fill: #CCCCCC;
@@ -89,6 +89,7 @@
 			{
 				if(e.which == 1)
 				{
+					$(".delete").remove();
 					$(".umlclass").removeClass("selected");
 					$(this).addClass("selected");
 					currentX = e.clientX;
@@ -109,7 +110,6 @@
 					var dy = e.clientY - currentY;
 					currentMatrix[4] += dx;
 					currentMatrix[5] += dy;
-					console.log(element);
 					UMLClasses[element.attr("id")].x = currentMatrix[4];
 					UMLClasses[element.attr("id")].y = currentMatrix[5];
 					var newMatrix = "matrix("+currentMatrix.join(" ") + ")";
@@ -121,6 +121,7 @@
 
 			$(document).on("mouseup", ".umlclass", function(e){
 				$(this).removeClass("selected");
+				$(this).mouseenter();
 			});
 
 			$("#refresh").on("click", function(){
@@ -129,13 +130,24 @@
 				});
 			});
 
-			$(document).on("mouseover", ".umlclass", function(e){
-				console.log("Hover");
+			$(document).on("mouseenter", ".umlclass", function(e){
 				var c = UMLClasses[$(this).attr("id")];
-				var dButton = "<button id='delete' class='btn' style='top:"+c.y+"; left:"+c.x+"'>X</button>";
-				$("#class_"+c.id+"_parent").append(dButton);
+				var dButton = "<button data-target='"+$(this).attr("id")+"' class='btn delete' style='top:"+(c.y+10)+"; left:"+(c.x+10)+"; position:absolute'>X</button>";
+				$("body").append(dButton);
 			});
 			
+			$(document).on("mouseleave", ".umlclass", function(event){
+				var e = event.toElement || event.relatedTarget;
+				if (e.tagName.toLowerCase() == "button") {
+			        return;
+			    }
+				$(".delete").remove();
+			});
+
+			$(document).on("click", ".delete", function(){
+				UMLClasses[$(this).data("target")].destroy();
+				$(".delete").remove();
+			});
 
 		});
 
