@@ -135,7 +135,7 @@
 			<svg class="umlcanvas">
 			</svg>
 		</div>
-		<div class="row" id="edit_form">
+		<div class="row hidden" id="edit_form">
 			<div class="col-lg-4">
 				<div class="form-group">
 					<div class="row">
@@ -281,6 +281,7 @@
 				$("#edit_classname").focus();
 				$("#edit_classname").select();
 				$("#select").click();
+				$("#edit_form").removeClass("hidden");
 			});
 
 			$(".btn-toolbar").on("click", function(){
@@ -292,6 +293,7 @@
 					$("#"+status).removeClass("btn-warning");
 					$("html, body").css("cursor", "");
 					holderObject = {};
+					$("#edit_form").addClass("hidden");
 				}
 				status = $(this).attr("id");
 				$(this).addClass("btn-warning");
@@ -301,7 +303,7 @@
 				$("html, body").css("cursor", "crosshair");
 				$(this).addClass("btn-warning");
 			});
-		});
+		
 
 		$(document).on("mousedown", ".umlclass", function(e){
 			if(status != "draw_line"){
@@ -348,5 +350,14 @@
 				$(".umlcanvas").append(path);
 			}
 		});
+
+		$(".umlcanvas").on("click", function(){
+			if(status == "select")
+			{
+				$("#edit_form").addClass("hidden");
+				UMLClasses[$("#edit_target").val()].render();
+			}
+		});
+	});
 	</script>
 @endsection

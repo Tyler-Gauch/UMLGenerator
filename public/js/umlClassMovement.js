@@ -34,6 +34,8 @@ $(document).on("mousedown", ".umlclass", function(e)
 		{
 			currentMatrix[i] = parseFloat(currentMatrix[i]);
 		}
+
+		$("#edit_form").removeClass("hidden");
 	}
 });
 
