@@ -13,7 +13,7 @@
 
 		@yield("stylesheets")
 
-		<script type="javascript" src="/js/jquery-2.2.3.min.js"></script>
+		<script src="/js/jquery-2.2.3.min.js"></script>
 		<script src="/jquery-ui/jquery-ui.min.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
 
