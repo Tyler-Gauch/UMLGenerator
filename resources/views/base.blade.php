@@ -12,6 +12,12 @@
 		<link rel="stylesheet" href="/css/font-awesome.min.css"/>
 
 		@yield("stylesheets")
+
+		<script type="javascript" src="/js/jquery-2.2.3.min.js"></script>
+		<script src="/jquery-ui/jquery-ui.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+
+		@yield("javascript")
 	</head>
 
 	<body style="top:50px">
@@ -19,10 +25,4 @@
 				@yield('content')
 		</div>
 	</body>
-
-	<script type="javascript" src="/js/jquery-2.2.3.min.js"></script>
-	<script src="/jquery-ui/jquery-ui.min.js"></script>
-	<script src="/js/bootstrap.min.js"></script>
-
-	@yield("javascript")
 </html>
