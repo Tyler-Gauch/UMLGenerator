@@ -1,6 +1,4 @@
 var UMLClassID = 0;
-var UMLClasses = {};
-
 var UMLClass = function(config){
 	var className = config.classname;
 	if(className == null || className == undefined || className == "")
@@ -52,22 +50,34 @@ UMLClass.prototype = {
 	relationships: [],
 	x: 0,
 	y: 0,
-	render: function(){
+	selected: false,
+	width: 200,
+	render: function(selected = false, moving = false){
+		this.selected = selected;
 		var y = 0;
 		var x = 0;
 		var nameHeight = 30;
 		var attributesHeight = this.attributes.length * 15 + 10;
 		var functionsHeight = this.functions.length * 15 + 10;
-		
+		var fullheight = nameHeight+attributesHeight+functionsHeight;
+		this.fullHeight = fullheight;
+
 		$("#class_"+this.id+"_parent").remove();
 
 		var uml = '<svg id="class_'+this.id+'_parent">'+
-			'<g class="umlclass" transform="matrix(1 0 0 1 '+this.x+' '+this.y+')" id="class_'+this.id+'">'+
-				'<g>'+
-					'<rect class="umlclass-name-rect" x="'+x+'" y="'+y+'" width="200" height="'+nameHeight+'" ></rect>'+
-					'<rect class="umlclass-attributes-rect" x="'+x+'" y="'+(y+nameHeight)+'" width="200" height="'+attributesHeight+'"/></rect>'+
-					'<rect class="umlclass-functions-rect" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="200" height="'+functionsHeight+'"/></rect>'+
-				'</g>'+
+			'<g class="umlclass';
+			if(moving){
+				uml += " moving";
+			}
+			uml += '" transform="matrix(1 0 0 1 '+this.x+' '+this.y+')" id="class_'+this.id+'">'+
+				'<g>';
+					if(selected){
+						uml += '<rect class="selected" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
+					}
+					uml += '<rect class="umlclass-name-rect" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
+					'<rect class="umlclass-attributes-rect" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
+					'<rect class="umlclass-functions-rect" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';
+			uml += '</g>'+
 				'<g>'+
 					'<text class="umlclass-name-text" x="'+(x+100)+'" y="'+(y+15)+'">'+this.className+'</text>';
 					y += nameHeight+15;
@@ -89,5 +99,43 @@ UMLClass.prototype = {
 	destroy: function(){
 		$("#class_"+this.id+"_parent").remove();
 		delete UMLClasses["class_"+this.id];
+	},
+	topLeft: function(){
+		return {x: this.x, y: this.y};
+	},
+	topRight: function(){
+		return {x: this.x+this.width, y: this.y};
+	},
+	bottomLeft: function(){
+		return {x: this.x, y: this.y+this.fullHeight};
+	},
+	bottomRight: function(){
+		return {x: this.x+this.width, y: this.y+this.fullHeight};
+	},
+	topMidPoint: function(){
+		var tl = this.topLeft();
+		var tr = this.topRight();
+		return midpoint(tl.x, tl.y, tr.x, tr.y);
+	},
+	leftMidPoint: function(){
+		var tl = this.topLeft();
+		var bl = this.bottomLeft();
+		return midpoint(tl.x, tl.y, bl.x, bl.y);
+	},
+	rightMidPoint: function(){
+		var tr = this.topRight();
+		var br = this.bottomRight();
+		return midpoint(tr.x, tr.y, br.x, br.y);
+	},
+	bottomMidPoint: function(){
+		var br = this.bottomRight();
+		var bl = this.bottomLeft();
+		return midpoint(bl.x, bl.y, br.x, br.y);
+	},
+	midPoint: function(){
+		var bP = this.bottomMidPoint();
+		var tP = this.topMidPoint();
+		return midpoint(bP.x, bP.y, tP.x, tP.y);
 	}
+
 }
