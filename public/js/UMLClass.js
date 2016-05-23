@@ -112,30 +112,66 @@ UMLClass.prototype = {
 	bottomRight: function(){
 		return {x: this.x+this.width, y: this.y+this.fullHeight};
 	},
-	topMidPoint: function(){
-		var tl = this.topLeft();
-		var tr = this.topRight();
-		return midpoint(tl.x, tl.y, tr.x, tr.y);
+	topMidPoint: function(tl, tr){
+		if(tl == undefined) tl = this.topLeft();
+		if(tr == undefined) tr = this.topRight();
+		return window.midpoint(tl.x, tl.y, tr.x, tr.y);
 	},
-	leftMidPoint: function(){
-		var tl = this.topLeft();
-		var bl = this.bottomLeft();
-		return midpoint(tl.x, tl.y, bl.x, bl.y);
+	leftMidPoint: function(tl, bl){
+		if(tl == undefined) tl = this.topLeft();
+		if(bl == undefined) bl = this.bottomLeft();
+		return window.midpoint(tl.x, tl.y, bl.x, bl.y);
 	},
-	rightMidPoint: function(){
-		var tr = this.topRight();
-		var br = this.bottomRight();
-		return midpoint(tr.x, tr.y, br.x, br.y);
+	rightMidPoint: function(tr, br){
+		if(tr == undefined) tr = this.topRight();
+		if(br == undefined) br = this.bottomRight();
+		return window.midpoint(tr.x, tr.y, br.x, br.y);
 	},
-	bottomMidPoint: function(){
-		var br = this.bottomRight();
-		var bl = this.bottomLeft();
-		return midpoint(bl.x, bl.y, br.x, br.y);
+	bottomMidPoint: function(br, bl){
+		if(br == undefined) br = this.bottomRight();
+		if(bl == undefined) bl = this.bottomLeft();
+		return window.midpoint(bl.x, bl.y, br.x, br.y);
 	},
 	midPoint: function(){
 		var bP = this.bottomMidPoint();
 		var tP = this.topMidPoint();
-		return midpoint(bP.x, bP.y, tP.x, tP.y);
+		return window.midpoint(bP.x, bP.y, tP.x, tP.y);
+	},
+	getConnectionPoints: function(){
+		var points = [];
+		var tl = this.topLeft();
+		var tr = this.topRight();
+		var bl = this.bottomLeft();
+		var br = this.bottomRight();
+		points.push(tl);
+		points.push(tr);
+		points.push(bl);
+		points.push(br);
+		points.push(this.bottomMidPoint(br, bl));
+		points.push(this.topMidPoint(tl, tr));
+		points.push(this.leftMidPoint(tl, bl));
+		points.push(this.rightMidPoint(tr, br));
+
+		return points;
+	},
+	findClosestConnection: function(x,y){
+		var closestPoint = null;
+		var closestDistance = 0;
+
+		var points = this.getConnectionPoints();
+
+		for(var i = 0; i < points.length; i++)
+		{
+			var point = points[i];
+			var distance = window.distance(x,y, point.x, point.y);
+			if(closestPoint == null || distance < closestDistance)
+			{
+				closestPoint = point;
+				closestDistance = distance;
+			}
+		}
+
+		return closestPoint;
 	}
 
 }

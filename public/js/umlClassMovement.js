@@ -75,8 +75,8 @@ function moveRelationShip($this){
 
 	var emp = cEnd.midPoint();
 	var smp = cStart.midPoint();
-	var startPoint = findNearestSide(emp.x, emp.y, cStart);
-	var endPoint = findNearestSide(smp.x, smp.y, cEnd);
+	var startPoint = cStart.findClosestConnection(emp.x, emp.y);
+	var endPoint = cEnd.findClosestConnection(smp.x, smp.y);
 
 	$this.remove();
 

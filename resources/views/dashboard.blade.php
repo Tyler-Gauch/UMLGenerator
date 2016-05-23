@@ -200,52 +200,16 @@
 		//blade variables
 
 		//global functions
-		function distance(x1, y1, x2, y2)
+		window.distance = function(x1, y1, x2, y2)
 		{
 			return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 		}
 
-		function midpoint(x1, y1, x2, y2)
+		window.midpoint = function(x1, y1, x2, y2)
 		{
 			return {x: (x1+x2)/2, y: (y1+y2)/2}
 		}
 
-		function findNearestSide(x, y, umlclass)
-		{
-			var closestPoint = {};
-			var closestDistance = 0;
-
-			var topMidPoint = umlclass.topMidPoint();
-			var topMidDistance = distance(x,y, topMidPoint.x, topMidPoint.y);
-			closestPoint = topMidPoint;
-			closestDistance = topMidDistance;
-
-			var leftMidPoint = umlclass.leftMidPoint();
-			var leftMidDistance = distance(x,y, leftMidPoint.x, leftMidPoint.y);
-			if(closestDistance > leftMidDistance)
-			{
-				closestDistance = leftMidDistance;
-				closestPoint = leftMidPoint;
-			}
-
-			var rightMidPoint = umlclass.rightMidPoint();
-			var rightMidDistance = distance(x,y, rightMidPoint.x, rightMidPoint.y);
-			if(closestDistance > rightMidDistance)
-			{
-				closestDistance = rightMidDistance;
-				closestPoint = rightMidPoint;
-			}
-
-			var bottomMidPoint = umlclass.bottomMidPoint();
-			var bottomMidDistance = distance(x,y, bottomMidPoint.x, bottomMidPoint.y);
-			if(closestDistance > bottomMidDistance)
-			{
-				closestDistance = bottomMidDistance;
-				closestPoint = bottomMidPoint;
-			}
-
-			return closestPoint;
-		}
 	</script>
 
 	<script src="/js/UMLClass.js"></script>
@@ -315,12 +279,12 @@
 
 				if(holderObject["pathStart"] == undefined)
 				{
-					var mouseClick = findNearestSide(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top, c);
+					var mouseClick = c.findClosestConnection(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top);
 					mouseClick["c"] = c;
 
 					holderObject["pathStart"] = mouseClick;
 				}else{
-					var mouseClick = findNearestSide(holderObject["pathStart"].x, holderObject["pathStart"].y, c);
+					var mouseClick = c.findClosestConnection(holderObject["pathStart"].x, holderObject["pathStart"].y);
 					mouseClick["c"] = c;
 
 					holderObject["pathEnd"] = mouseClick;
@@ -341,7 +305,7 @@
 			{
 				$("#line-temp").remove();
 				var c = holderObject["pathStart"].c;
-				var mouseClick = findNearestSide(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top, c);
+				var mouseClick = c.findClosestConnection(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top);
 				mouseClick["c"] = c;
 				holderObject["pathStart"] = mouseClick;
 				var path = '<svg height="5000" width="5000" id="line-temp">';
