@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 	<head>
 		<title>UML Generator</title>
@@ -13,11 +12,6 @@
 
 		@yield("stylesheets")
 
-		<script src="/js/jquery-2.2.3.min.js"></script>
-		<script src="/jquery-ui/jquery-ui.min.js"></script>
-		<script src="/js/bootstrap.min.js"></script>
-
-		@yield("javascript")
 	</head>
 
 	<body style="top:50px">
@@ -25,4 +19,11 @@
 				@yield('content')
 		</div>
 	</body>
+
+	<script src="/js/jquery-2.2.3.min.js"></script>
+	<script src="/jquery-ui/jquery-ui.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+
+	@yield("javascript")
+	
 </html>
