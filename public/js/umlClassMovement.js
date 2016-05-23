@@ -2,7 +2,7 @@ var currentMatrix = null;
 var currentX = null;
 var currentY = null;
 
-$(document).on("mousedown", ".umlclass", function(e)
+$(document).on("mousedown touchstart", ".umlclass", function(e)
 {
 	if(status != "select")
 	{
@@ -39,7 +39,7 @@ $(document).on("mousedown", ".umlclass", function(e)
 	}
 });
 
-$(document).on("mousemove", function(e){
+$(document).on("mousemove touchmove", function(e){
 	var element = $(".umlclass.moving");
 	if(element.length > 0)
 	{
@@ -64,7 +64,7 @@ $(document).on("mousemove", function(e){
 	}
 });
 
-$(document).on("mouseup", ".umlclass", function(e){
+$(document).on("mouseup touchend", ".umlclass", function(e){
 	$(this).removeClass("moving");
 	$(this).mouseenter();
 });
