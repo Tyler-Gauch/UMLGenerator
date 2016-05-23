@@ -5,12 +5,14 @@
 //////////////////////////////////////////////////////
 
 $("#edit_delete").on("click", function(){
-	var c = UMLClasses[$("#edit_target").val()];
-	if(confirm("Are you sure you want to delete <strong>"+c.className+"</strong>?"))
-	{
-		delete UMLClasses[$("#edit_target").val()];
-		$("#class_"+c.id+"_parent").remove();
-		clearEditForm();
+	deleteClass();
+});
+
+$(document).on("keyup", function(e){
+	var code = e.keyCode || e.which;
+	if(code == 46) { //delete keycode
+		e.preventDefault();
+	   deleteClass();
 	}
 });
 
@@ -21,6 +23,22 @@ function clearEditForm(){
 	$("#edit_functions").empty();
 	$("#edit_functions_add").val("");
 	$("#edit_target").val("null");
+}
+
+function deleteClass(){
+	var c = UMLClasses[$("#edit_target").val()];
+	if(confirm("Are you sure you want to delete "+c.className+"?"))
+	{
+		$(document).find("[data-end='class_"+c.id+"']").each(function(key){
+			$(this).remove();
+		});
+		$(document).find("[data-start='class_"+c.id+"']").each(function(key){
+			$(this).remove();
+		});
+		delete UMLClasses[$("#edit_target").val()];
+		$("#class_"+c.id+"_parent").remove();
+		clearEditForm();
+	}
 }
 
 //////////////////////////////////////////////////////

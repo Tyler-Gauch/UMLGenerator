@@ -74,20 +74,20 @@ UMLClass.prototype = {
 					if(selected){
 						uml += '<rect class="selected" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
 					}
-					uml += '<rect class="umlclass-name-rect" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
-					'<rect class="umlclass-attributes-rect" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
-					'<rect class="umlclass-functions-rect" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';
+					uml += '<rect class="umlclass-name-rect" fill="#AA5439" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
+					'<rect class="umlclass-attributes-rect" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
+					'<rect class="umlclass-functions-rect" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';
 			uml += '</g>'+
 				'<g>'+
-					'<text class="umlclass-name-text" x="'+(x+100)+'" y="'+(y+15)+'">'+this.className+'</text>';
+					'<text class="umlclass-name-text" text-anchor="middle" fill="black" stroke-width="0px" x="'+(x+100)+'" y="'+(y+15)+'">'+this.className+'</text>';
 					y += nameHeight+15;
 					$.each(this.attributes, function(key, attribute){
-						uml += '<text class="umlclass-attributes-text" x="'+(x+5)+'" y="'+y+'">'+attribute+'</text>';
+						uml += '<text class="umlclass-attributes-text" fill="black" stroke-width="0px" x="'+(x+5)+'" y="'+y+'">'+attribute+'</text>';
 						y+=15;
 					})
 					y+=10;
 					$.each(this.functions, function(key, func){
-						uml += '<text class="umlclass-functions-text" x="'+(x+5)+'" y="'+y+'">'+func+'</text>';
+						uml += '<text class="umlclass-functions-text" fill="black" stroke-width="0px" x="'+(x+5)+'" y="'+y+'">'+func+'</text>';
 						y+=15;
 					})
 				'</g>'+

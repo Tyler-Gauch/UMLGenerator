@@ -128,6 +128,7 @@
 		<button id="select" class="btn btn-primary btn-toolbar btn-warning"><i class="fa fa-mouse-pointer"></i></button>
 		<button id="add_class" class="btn btn-primary btn-toolbar skip-status"><i class="fa fa-plus"></i></button>
 		<button id="draw_line" class="btn btn-primary btn-toolbar"><i class="fa fa-arrows-h"></i></button>
+		<button id="save" class="btn btn-primary btn-toolbar skip-status"><i class="fa fa-save"></i></button>
 	</div>
 	<div class="content">
 		<div class="row parent-container" id="parent">
@@ -253,9 +254,20 @@
 	<script>
 		$(document).ready(function(){
 
+			$("#save").on("click", function(){
+				var content = "<svg>"+$(".umlcanvas").html()+"</svg>";
+				  var blob = new Blob([content]);
+				  var evt = document.createEvent("HTMLEvents");
+				  evt.initEvent("click");
+				  $("<a>", {
+				    download: "url_generator.svg",
+				    href: webkitURL.createObjectURL(blob)
+				  }).get(0).dispatchEvent(evt);
+			});
+
 			$(".umlcanvas").on("contextmenu", function(e){
-				e.preventDefault();
 				if(status == "draw_line"){
+					e.preventDefault();
 					$("#line-temp").remove();
 					delete holderObject["pathStart"];
 					delete holderObject["pathEnd"];
@@ -312,7 +324,7 @@
 					holderObject["pathEnd"] = mouseClick;
 					$("#line-temp").remove();
 					var path = '<svg height="5000" width="5000" data-start="class_'+holderObject["pathStart"].c.id+'" data-end="class_'+holderObject["pathEnd"].c.id+'">';
-						path += "<path class='line' d='M"+holderObject["pathStart"].x+" "+holderObject["pathStart"].y+" L"+holderObject["pathEnd"].x+" "+holderObject["pathEnd"].y+"'></path>";
+						path += "<path class='line' stroke-width='2px' stroke='black' d='M"+holderObject["pathStart"].x+" "+holderObject["pathStart"].y+" L"+holderObject["pathEnd"].x+" "+holderObject["pathEnd"].y+"'></path>";
 					path += '</svg>';
 			
 					$(".umlcanvas").append(path);

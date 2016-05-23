@@ -79,7 +79,7 @@ function moveRelationShip($this){
 	$this.remove();
 
 	var path = '<svg height="5000" width="5000" data-start="class_'+cStart.id+'" data-end="class_'+cEnd.id+'">';
-		path += "<path class='line' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
+		path += "<path class='line' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
 	path += '</svg>';
 	$(".umlcanvas").append(path);
 }
