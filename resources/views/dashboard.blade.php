@@ -239,13 +239,38 @@
 			});
 
 			$("#add_class").on("click", function(){
-				var umlclass = new UMLClass({className:"Class "+(i++)});
-				$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
-				$("#class_"+umlclass.id).mouseup();
-				$("#edit_classname").focus();
-				$("#edit_classname").select();
-				$("#select").click();
-				$("#edit_form").removeClass("hidden");
+				if(confirm("Would you like to add from a file?")){
+					var filePath = prompt("Please Enter the file Path:");
+
+					$.ajax({
+						url: "/parser/java",
+						method: "GET",
+						data: {fileName: filePath},
+						success: function(data){
+							if(data.success){
+								$.each(data.data, function(key, value){
+									var umlclass = new UMLClass({className:value.className, attributes: value.attributes, functions: value.functions});
+									$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
+									$("#class_"+umlclass.id).mouseup();
+									$("#edit_classname").focus();
+									$("#edit_classname").select();
+									$("#select").click();
+									$("#edit_form").removeClass("hidden");
+								});
+							}else{
+								alert("Error: "+data.message);
+							}
+						}
+					});
+				}else{
+					var umlclass = new UMLClass({});
+					$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
+					$("#class_"+umlclass.id).mouseup();
+					$("#edit_classname").focus();
+					$("#edit_classname").select();
+					$("#select").click();
+					$("#edit_form").removeClass("hidden");
+				}
 			});
 
 			$(".btn-toolbar").on("click", function(){

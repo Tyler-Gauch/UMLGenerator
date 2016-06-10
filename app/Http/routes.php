@@ -12,3 +12,4 @@
 */
 
 Route::get('/', "DashboardController@index");
+Route::any("/parser/java", "ParserController@javaParser");

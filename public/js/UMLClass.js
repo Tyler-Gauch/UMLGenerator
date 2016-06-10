@@ -1,6 +1,7 @@
 var UMLClassID = 0;
 var UMLClass = function(config){
-	var className = config.classname;
+	console.log(config);
+	var className = config.className;
 	if(className == null || className == undefined || className == "")
 	{
 		className = "Class"+UMLClassID;
