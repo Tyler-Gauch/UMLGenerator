@@ -1,4 +1,6 @@
 var UMLClassID = 0;
+var UMLClassX = 10;
+var UMLClassY = 10;
 var UMLClass = function(config){
 	console.log(config);
 	var className = config.className;
@@ -23,12 +25,12 @@ var UMLClass = function(config){
 
 	if(config.x == undefined)
 	{
-		config.x = 100;
+		config.x = UMLClassX;
 	}
 
 	if(config.y == undefined)
 	{
-		config.y = 100;
+		config.y = UMLClassY;
 	}
 	this.className = className;
 	this.attributes = config.attributes;
@@ -62,6 +64,13 @@ UMLClass.prototype = {
 		var functionsHeight = this.functions.length * 15 + 10;
 		var fullheight = nameHeight+attributesHeight+functionsHeight;
 		this.fullHeight = fullheight;
+		UMLClassY += this.fullHeight+10;
+		if(UMLClassY > 750)
+		{
+			UMLClassY = 10;
+			UMLClassX += this.width+10;
+		}
+		
 
 		$("#class_"+this.id+"_parent").remove();
 

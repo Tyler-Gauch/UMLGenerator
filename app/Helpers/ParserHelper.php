@@ -2,11 +2,14 @@
 
 namespace App\Helpers;
 
+use Log;
+
 abstract class ParserHelper {
 
 	protected $fileContents;
 	protected $iterator = 0;
 	protected $keywords;
+	protected $statement_seperator = ";";
 
 	/**
 	*@param string $fileContents
@@ -42,9 +45,39 @@ abstract class ParserHelper {
 		return null;
 	}
 
+	protected function getNextStatement($temp = false){
+		$word = "";
+		$tempIterator = $this->eatWhiteSpace($this->iterator);
+		$tempIterator = $this->eatComments($tempIterator);
+		for($tempIterator; $tempIterator < strlen($this->fileContents); $tempIterator++){
+
+			switch($this->fileContents[$tempIterator])
+			{
+				case $this->statement_seperator:
+				$tempIterator++;
+					if(!$temp)
+					{
+						$this->iterator = $tempIterator;
+					}
+					$word .= ";";
+					return $word;
+				default:
+					$word .= $this->fileContents[$tempIterator];
+					break;
+			}
+
+		}
+		if(!$temp)
+		{
+			$this->iterator = $tempIterator;
+		}
+		return null;
+	}
+
 	protected function getNextWord($temp = false){
 		$word = "";
 		$tempIterator = $this->eatWhiteSpace($this->iterator);
+		$tempIterator = $this->eatComments($tempIterator);
 		for($tempIterator; $tempIterator < strlen($this->fileContents); $tempIterator++){
 
 			switch($this->fileContents[$tempIterator])
@@ -57,6 +90,7 @@ abstract class ParserHelper {
 					{
 						$this->iterator = $tempIterator;
 					}
+					Log::info("Returning: $word");
 					return $word;
 				default:
 					$word .= $this->fileContents[$tempIterator];
@@ -94,6 +128,8 @@ abstract class ParserHelper {
 		return $tempIterator;
 	}
 
+	protected abstract function eatComments($tempIterator);
+
 	protected static function parseDirectory($pathName, &$results){
 		$dir = new \DirectoryIterator($pathName);
 		foreach ($dir as $fileinfo) {
@@ -117,5 +153,10 @@ abstract class ParserHelper {
 		$results = [];
 		ParserHelper::parseFile($fileName, $results);
 		return $results;
+	}
+
+	protected function sanitize($word){
+		$word = preg_replace('/(\s|'.$this->statement_seperator.'|\[|\]|\{|\}|=|,)+/s', "", $word);
+		return $word;
 	}
 }

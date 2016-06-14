@@ -11,5 +11,21 @@
 |
 */
 
-Route::get('/', "DashboardController@index");
-Route::any("/parser/java", "ParserController@javaParser");
+Route::group(["prefix" => "/auth"], function(){
+	Route::get("/", "Auth\\AuthController@login");
+	Route::get("/github", "Auth\\AuthController@loginWithGithub");	
+	Route::get('/logout', 'Auth\AuthController@getLogout');
+});
+
+Route::group(["middleware" => 'auth'], function(){
+	Route::get('/{project?}', "DashboardController@index");
+
+	Route::post("/parser/java", "ParserController@javaParser");
+	Route::get("/parser/{repo}/{branch}", "ParserController@parseBranch");
+
+	Route::post("/repo/list", "DashboardController@listRepos");
+	Route::post("/branch/list", "DashboardController@listBranches");
+	
+	Route::post("/project/create", 'ProjectController@create');
+	Route::get("/project/get/{project?}", 'ProjectController@get');
+});

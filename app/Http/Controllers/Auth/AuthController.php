@@ -7,6 +7,14 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use OAuth\OAuth2\Service\GitHub;
+use OAuth\Common\Storage\Session;
+use OAuth\Common\Consumer\Credentials;
+use Config;
+use Auth;
+use Log;
 
 class AuthController extends Controller
 {
@@ -30,43 +38,60 @@ class AuthController extends Controller
      */
     protected $redirectTo = '/';
 
-    /**
-     * Create a new authentication controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
+    public function login(){
+        Log::info("In login page");
+        $githubService = $this->getGithubService();
+        $url = $githubService->getAuthorizationUri();
+        return response()->view("auth.login", ["github"=>$url]);
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
+    public function loginWithGithub(Request $request){
+
+        Log::info("In Login with GitHub");
+        $code = $request->input("code", null);
+
+        $githubService = $this->getGithubService();
+
+        if($code != null)
+        {
+            Log::info("Retrieved Code");
+            $token = $githubService->requestAccessToken($code);
+
+            $result = json_decode($githubService->request("https://api.github.com/user"), true);
+            $result["token"] = $token;
+
+            Log::info("Data base find or create user");
+            $user = $this->findOrCreateUser($result);
+
+            Log::info("Logging in user");
+            Auth::login($user, true);
+
+            return redirect("/");
+        }else{
+            Log::info("No code provided");
+            return response()->view("auth.login", ["github"=>$url]);
+        }
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return User
-     */
-    protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);
+    private function getGithubService(){
+        $config = Config::get("oauth-5-laravel.consumers.GitHub");
+
+        $creds = new Credentials($config["client_id"], $config["client_secret"], "http://localhost/auth/github");
+
+        return \OAuth::consumer("GitHub", $creds);
+    }
+
+    private function findOrCreateUser($user){
+        if(($authUser = User::where("email", "=", $user["email"])->first()) != null){
+            return $authUser;
+        }else{
+            return User::create([
+                "name" => $user["name"],
+                "email" => $user["email"],
+                "provider_id" => $user["id"],
+                "username" => $user["login"],
+                "access_token" => $user["token"]->getAccessToken()
+            ]);
+        }
     }
 }

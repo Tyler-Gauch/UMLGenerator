@@ -1,0 +1,92 @@
+.parent-container{
+	height: 80%;
+	border: 1px solid;
+	overflow: scroll;
+}
+.umlcanvas{
+	width: 5000px;
+	height: 5000px;
+}
+.umlclass{
+	border: 5px solid;
+	display: inline-block;
+	border-radius: 10px;
+	fill: #FFFFFF;
+	stroke-width: 1px;
+	stroke: #000;
+}
+
+.umlclass-attributes-rect{
+	fill: #FF7144;
+	stroke-width: 1px;
+	stroke: #000;
+}
+.umlclass-attributes-text{
+	fill: black;
+	stroke-width: 0px;
+}
+
+.umlclass-functions-rect{
+	fill: #FF7144;
+	stroke-width: 1px;
+	stroke: #000;
+}
+.umlclass-functions-text{
+	fill: black;
+	stroke-width: 0px;
+}
+
+.umlclass-name-rect{
+	fill: #AA5439;
+}
+.umlclass-name-text{
+	text-anchor: middle;
+	fill: black;
+	stroke-width: 0px;
+}
+
+.selected{
+	stroke-width: 5px;
+	stroke: #00F;
+}
+
+.btn-toolbar{
+	padding-left: 8px;
+	border: 1px #CCC solid;
+	border-radius: 0px !important;
+	height: 35px;
+	margin: 5px;
+}
+
+.line{
+	stroke: black;
+	stroke-width: 2px;
+}
+.line2{
+	stroke-width: 2px;
+}
+
+.line:hover{
+	stroke: red;
+	stroke-width: 5px;
+}
+
+.line.temp{
+	stroke: blue;
+}
+
+.toolbar.left{
+	float: left;
+}
+.toolbar.right{
+	float:right;
+}
+
+.hot_key{
+	color: #ccc;
+	font-size: 12px;
+}
+
+.dropdown-menu-large{
+	width: 300px;
+}

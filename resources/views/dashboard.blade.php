@@ -1,191 +1,208 @@
 @extends("base")
 
 @section("stylesheets")
-	<style>
-		.parent-container{
-			width: 100%;
-			height: 75%;
-			border: 1px solid;
-			overflow: scroll;
-		}
-		.umlcanvas{
-			width: 5000px;
-			height: 5000px;
-		}
-		.umlclass{
-			border: 5px solid;
-			display: inline-block;
-			border-radius: 10px;
-			fill: #FFFFFF;
-			stroke-width: 1px;
-			stroke: #000;
-		}
+	<link rel="stylesheet" href="dashboard/dashboard.css"/>
+@endsection
 
-		.umlclass-attributes-rect{
-			fill: #FF7144;
-			stroke-width: 1px;
-			stroke: #000;
-		}
-		.umlclass-attributes-text{
-			fill: black;
-			stroke-width: 0px;
-		}
-
-		.umlclass-functions-rect{
-			fill: #FF7144;
-			stroke-width: 1px;
-			stroke: #000;
-		}
-		.umlclass-functions-text{
-			fill: black;
-			stroke-width: 0px;
-		}
-
-		.umlclass-name-rect{
-			fill: #AA5439;
-		}
-		.umlclass-name-text{
-			text-anchor: middle;
-			fill: black;
-			stroke-width: 0px;
-		}
-		
-		.selected{
-			stroke-width: 5px;
-			stroke: #00F;
-		}
-
-		#edit_form{
-			width: 100%;
-			overflow: scroll;
-		}
-
-		.toolbar{
-			position: fixed;
-			padding-left: 10px;
-			padding-right: 10px;
-			padding-top: 5px;
-			padding-bottom: 5px;
-			left:0px;
-			top: 0px;
-			width: 100%;
-			height: 50px;
-			background-color: #262121;
-		}
-
-		.btn-toolbar{
-			width:30px !important;
-			padding-left: 8px;
-			border: 1px #CCC solid;
-			display: block;
-			height: 100%;
-			border-radius: 0px !important;
-			float:left;
-		}
-
-		.content{
-			width:100%;
-			padding-top: 55px;		
-			padding-left: 25px;	
-		}
-		.brand{
-			font-size: 32px !important;
-			height:100%;
-			display: block;
-			float:left;
-			padding-right: 20px;
-			border-right: 1px #ccc solid;
-			text-decoration: none !important;
-			color: #ccc !important;
-		}
-
-		.line{
-			stroke: black;
-			stroke-width: 2px;
-		}
-		.line2{
-			stroke-width: 2px;
-		}
-
-		.line:hover{
-			stroke: red;
-			stroke-width: 5px;
-		}
-
-		.line.temp{
-			stroke: blue;
-		}
-
-
-	</style>
+@section("extra_nav")
+	<li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File<span class="caret"></span></a>
+      <ul class="dropdown-menu dropdown-menu-large">
+      	<li>
+      		<a href="#" class="clear-fix new_project">
+      			New Project <span class="hot_key pull-right">CTRL+N</span>
+      		</a>
+      	</li>
+      	<li>
+      		<a href="#" class="clear-fix open_project">
+      			Open Project <span class="hot_key pull-right">CTRL+O</span>
+      		</a>
+      	</li>
+      	<li>
+      		<a href="#" id="save_project" class="clear-fix">
+      			Save <span class="hot_key pull-right">CTRL+S</span>
+      		</a>
+      	</li>
+      	<li>
+      		<a href="#" id="save_project_as" class="clear-fix">
+      			Save As <span class="hot_key pull-right">CTRL+SHIFT+S</span>
+      		</a>
+      	</li>
+      </ul>
+    </li>
+	<li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Edit<span class="caret"></span></a>
+      <ul class="dropdown-menu dropdown-menu-large">
+      	<li class="dropdown-submenu">
+		    <a tabindex="-1" href="#">Add Object</a>
+		    <ul class="dropdown-menu">
+		      	<li>
+		      		<a href="#" class="add_class">
+		      			Add Class
+		      		</a>
+		      	</li>
+		    </ul>
+		  </li>
+      	<li>
+      		<a href="#" id="save">
+      			Download <span class="hot_key pull-right">CTRL+D</span>
+      		</a>
+      	</li>
+      </ul>
+    </li>
+    <button id="select" class="btn btn-primary btn-toolbar btn-warning navbar-btn" type="button"><i class="fa fa-mouse-pointer"></i></button>
+    <button id="draw_line" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows-h"></i></button>
 @endsection
 
 @section("content")
-	<div class="toolbar">
-		<a class="brand" href="/">
-			UML Generator
-		</a>
-		<button id="select" class="btn btn-primary btn-toolbar btn-warning"><i class="fa fa-mouse-pointer"></i></button>
-		<button id="add_class" class="btn btn-primary btn-toolbar skip-status"><i class="fa fa-plus"></i></button>
-		<button id="draw_line" class="btn btn-primary btn-toolbar"><i class="fa fa-arrows-h"></i></button>
-		<button id="save" class="btn btn-primary btn-toolbar skip-status"><i class="fa fa-save"></i></button>
-	</div>
-	<div class="content">
-		<div class="row parent-container" id="parent">
-			<svg class="umlcanvas">
-			</svg>
-		</div>
-		<div class="row hidden" id="edit_form">
-			<div class="col-lg-4">
-				<div class="form-group">
-					<div class="row">
-						<label>Name:</label>
+	<div class="row">
+		<div class="col-lg-2">
+			<div class="row">
+				@if(isset($project))
+					<legend id="project_name">{{$project->name}}</legend>
+					<div class="col-lg-12">
+						<select id="change_project_branch" class="form-control">
+							<option value="null" selected>Please Choose A Branch</option>
+							@foreach($branches as $key=>$branch)
+								<option value="{{ $branch->name }}">{{$branch->name}}</option>
+							@endforeach
+						</select>
 					</div>
-					<div class="row">
-						<input type="text" id="edit_classname" class="form-control"/>
-					</div>
+				@endif
+				<div class="col-lg-12">
 				</div>
 			</div>
-			<div class="col-lg-4">
-				<div class="form-group">
-					<div class="row">
-						<label>Attributes:</label>
-					</div>
-					<div class="row" id="edit_attributes">
-					</div>
-					<div class="row">
-						<div class="input-group">
-							<input type="text" id="edit_attributes_add" class="form-control"/>
-							<span class="input-group-btn">
-								<button class="btn btn-primary" id="edit_attributes_add_btn">+</button>
-							</span>
+
+			<div class="row hidden" id="edit_form">
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
+							<label>Name:</label>
+						</div>
+						<div class="row">
+							<input type="text" id="edit_classname" class="form-control"/>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-lg-4">
-				<div class="form-group">
-					<div class="row">
-						<label>Functions:</label>
-					</div>
-					<div class="row" id="edit_functions">
-					</div>
-					<div class="row">
-						<div class="input-group">
-							<input type="text" id="edit_functions_add" class="form-control"/>
-							<span class="input-group-btn">
-								<button class="btn btn-primary" id="edit_functions_add_btn">+</button>
-							</span>
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
+							<label>Attributes:</label>
+						</div>
+						<div class="row" id="edit_attributes">
+						</div>
+						<div class="row">
+							<div class="input-group">
+								<input type="text" id="edit_attributes_add" class="form-control"/>
+								<span class="input-group-btn">
+									<button class="btn btn-primary" id="edit_attributes_add_btn">+</button>
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>	
-			<div class="col-lg-12">
-				<button id="edit_delete" class="btn btn-danger">Delete Class</button>
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
+							<label>Functions:</label>
+						</div>
+						<div class="row" id="edit_functions">
+						</div>
+						<div class="row">
+							<div class="input-group">
+								<input type="text" id="edit_functions_add" class="form-control"/>
+								<span class="input-group-btn">
+									<button class="btn btn-primary" id="edit_functions_add_btn">+</button>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>	
+				<div class="col-lg-12">
+					<button id="edit_delete" class="btn btn-danger">Delete Class</button>
+				</div>
+				<input type="hidden" value="null" id="edit_target"/>
 			</div>
-			<input type="hidden" value="null" id="edit_target"/>
+		</div>
+		<div class="col-lg-10">
+			<div class="row parent-container" id="parent">
+				<svg class="umlcanvas">
+				</svg>
+			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="new_project_modal">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">New Project</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+		        <div class="col-lg-12">
+		        	<div class="form-group">
+		        		<div class="col-lg-4">
+		        			<label>Repository</label>
+		        		</div>
+		        		<div class="col-lg-8">
+		        			<select id="new_project_repo" class="form-control">
+		        			</select>
+		        		</div>
+		        	</div>
+		        </div>
+		        <div class="col-lg-12">
+		        	<div class="col-lg-4">
+		        		<label>Language</label>
+		        	</div>
+		        	<div class="col-lg-8">
+		        		<select id="new_project_language" class="form-control">
+		        			<option value="null">Please Select a Language</option>
+		        			<option value="java">JAVA</option>
+		        			<option value="php" disabled>PHP-Coming Soon</option>
+		        		</select>
+		        	</div>
+		        </div>
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary" id="new_project_create">Create Project</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="open_project_modal">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Open Project</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+		        <div class="col-lg-12">
+		        	<div class="form-group">
+		        		<div class="col-lg-4">
+		        			<label>Project Name</label>
+		        		</div>
+		        		<div class="col-lg-8">
+		        			<select id="open_project_name" class="form-control">
+		        			</select>
+		        		</div>
+		        	</div>
+		        </div>
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary" id="open_project_button">Open Project</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
 
 @endsection
 
@@ -215,138 +232,136 @@
 	<script src="/js/UMLClass.js"></script>
 	<script src="/js/editForm.js"></script>
 	<script src="/js/umlClassMovement.js"></script>
+	<script src="/dashboard/dashboard.js"></script>
 	<script>
 		$(document).ready(function(){
 
-			$("#save").on("click", function(){
-				var content = "<svg>"+$(".umlcanvas").html()+"</svg>";
-				  var blob = new Blob([content]);
-				  var evt = document.createEvent("HTMLEvents");
-				  evt.initEvent("click");
-				  $("<a>", {
-				    download: "url_generator.svg",
-				    href: webkitURL.createObjectURL(blob)
-				  }).get(0).dispatchEvent(evt);
+			$(".new_project").on("click", function(e){
+				e.preventDefault();
+
+				getRepoNames(function(data){
+					if(data.success)
+					{
+						var modal = $("#new_project_modal");
+						var repoList = $("#new_project_repo");
+
+						repoList.empty();
+						repoList.append("<option value='null'>Please Select a Repository</option>");
+
+						$.each(data.repos, function(key, value){
+							repoList.append("<option value='"+value+"'>"+value+"</option>");
+						});
+
+						modal.modal("show");
+					}
+				});
+				
 			});
 
-			$(".umlcanvas").on("contextmenu", function(e){
-				if(status == "draw_line"){
-					e.preventDefault();
-					$("#line-temp").remove();
-					delete holderObject["pathStart"];
-					delete holderObject["pathEnd"];
-				}
-			});
+			$("#new_project_create").on("click", function(e){
+				e.preventDefault();
 
-			$("#add_class").on("click", function(){
-				if(confirm("Would you like to add from a file?")){
-					var filePath = prompt("Please Enter the file Path:");
+				var id = $("#new_project_repo").val();
+				var language = $("#new_project_language").val();
+				var name = $("#new_project_repo").val();
 
-					$.ajax({
-						url: "/parser/java",
-						method: "GET",
-						data: {fileName: filePath},
-						success: function(data){
-							if(data.success){
-								$.each(data.data, function(key, value){
-									var umlclass = new UMLClass({className:value.className, attributes: value.attributes, functions: value.functions});
-									$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
-									$("#class_"+umlclass.id).mouseup();
-									$("#edit_classname").focus();
-									$("#edit_classname").select();
-									$("#select").click();
-									$("#edit_form").removeClass("hidden");
-								});
-							}else{
-								alert("Error: "+data.message);
-							}
+				$.ajax({
+					method: "POST",
+					url: "/project/create",
+					data: {name: name, language: language},
+					success: function(data){
+						if(data.success)
+						{
+							window.location = "/"+name;
+						}else{
+							alert("Error:"+data.message);
 						}
-					});
-				}else{
-					var umlclass = new UMLClass({});
-					$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
-					$("#class_"+umlclass.id).mouseup();
-					$("#edit_classname").focus();
-					$("#edit_classname").select();
-					$("#select").click();
-					$("#edit_form").removeClass("hidden");
-				}
+					}
+				});
 			});
 
-			$(".btn-toolbar").on("click", function(){
-				if($(this).hasClass("skip-status")){
-					return;
-				}
-				if(status != null)
-				{
-					$("#"+status).removeClass("btn-warning");
-					$("html, body").css("cursor", "");
-					holderObject = {};
-					$("#edit_form").addClass("hidden");
-				}
-				status = $(this).attr("id");
-				$(this).addClass("btn-warning");
-			});
-
-			$("#draw_line").on("click", function(){
-				$("html, body").css("cursor", "crosshair");
-				$(this).addClass("btn-warning");
-			});
-		
-
-		$(document).on("mousedown", ".umlclass", function(e){
-			if(status != "draw_line"){
-				return;
+			function getRepoNames(callback){
+				$.ajax({
+					method:"POST",
+					url: "/repo/list",
+					success: function(data){
+						callback(data);
+					}
+				});
 			}
-			e.preventDefault();
-			if(e.which == 1){
-				var c = UMLClasses[$(this).attr("id")];
 
-				if(holderObject["pathStart"] == undefined)
-				{
-					var mouseClick = c.findClosestConnection(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top);
-					mouseClick["c"] = c;
-
-					holderObject["pathStart"] = mouseClick;
-				}else{
-					var mouseClick = c.findClosestConnection(holderObject["pathStart"].x, holderObject["pathStart"].y);
-					mouseClick["c"] = c;
-
-					holderObject["pathEnd"] = mouseClick;
-					$("#line-temp").remove();
-					var path = '<svg height="5000" width="5000" data-start="class_'+holderObject["pathStart"].c.id+'" data-end="class_'+holderObject["pathEnd"].c.id+'">';
-						path += "<path class='line' stroke-width='2px' stroke='black' d='M"+holderObject["pathStart"].x+" "+holderObject["pathStart"].y+" L"+holderObject["pathEnd"].x+" "+holderObject["pathEnd"].y+"'></path>";
-					path += '</svg>';
-			
-					$(".umlcanvas").append(path);
-					delete holderObject["pathStart"];
-					delete holderObject["pathEnd"];
-				}
-			}
-		});
-
-		$(".umlcanvas").on("mousemove", function(e){
-			if(status == "draw_line" && holderObject["pathStart"] != undefined)
+			function getBranchNames(callback)
 			{
-				$("#line-temp").remove();
-				var c = holderObject["pathStart"].c;
-				var mouseClick = c.findClosestConnection(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top);
-				mouseClick["c"] = c;
-				holderObject["pathStart"] = mouseClick;
-				var path = '<svg height="5000" width="5000" id="line-temp">';
-					path += "<path class='line temp' d='M"+holderObject["pathStart"].x+" "+holderObject["pathStart"].y+" L"+(e.clientX - $(".umlcanvas").offset().left-1)+" "+(e.clientY - $(".umlcanvas").offset().top-1) +"'></path>";
-				path += '</svg>';
-				$(".umlcanvas").append(path);
+				$.ajax({
+					method: "POST",
+					url: "/branch/list",
+					data: {repo: repo},
+					success: function(data){
+						callback(data);
+					}
+				});
 			}
-		});
 
-		$(".umlcanvas").on("click", function(){
-			if(status == "select")
-			{
-				$("#edit_form").addClass("hidden");
-				UMLClasses[$("#edit_target").val()].render();
+			function getProjects(callback){
+				$.ajax({
+					method: "GET",
+					url: "/project/get",
+					success: function(data){
+						callback(data);
+					}
+				});
 			}
+
+			$("#change_project_branch").on("change", function(e){
+				$.ajax({
+					url: "/parser/"+$("#project_name").text()+"/"+$(this).val(),
+					method: "GET",
+					success: function(data){
+						if(data.success)
+						{
+							$.each(data.data, function(key, value){
+								var umlClass = new UMLClass(value);
+							});
+						}else{
+							alert("Error: "+data.message);
+						}
+					}
+				});
+			});
+
+			$(".open_project").on("click", function(e){
+				e.preventDefault();
+
+				getProjects(function(data){
+					if(data.success){
+						var modal = $("#open_project_modal");
+						var projects = $("#open_project_name");
+
+						projects.empty();
+						projects.append("<option value='null'>Please select a Project</option>");
+
+						$.each(data.projects, function(key, value){
+							projects.append("<option value='"+value.name+"'>"+value.name+"</option>");
+						});
+
+						modal.modal("show");
+					}
+				});
+			});
+
+			$("#open_project_button").on("click", function(e){
+				e.preventDefault();
+
+				var project = $("#open_project_name").val();
+
+				if(project == null || project == "null")
+				{
+					alert("Please select a project");
+				}else{
+					window.location = "/"+project;
+				}
+			});
+
 		});
-	});
 	</script>
 @endsection
