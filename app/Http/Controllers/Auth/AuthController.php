@@ -74,9 +74,7 @@ class AuthController extends Controller
     }
 
     private function getGithubService(){
-        $config = Config::get("oauth-5-laravel.consumers.GitHub");
-
-        $creds = new Credentials($config["client_id"], $config["client_secret"], "http://localhost/auth/github");
+        $creds = new Credentials(env("GITHUB_CLIENT_ID"), env("GITHUB_CLIENT_SECRET"), env("GITHUB_REDIRECT_URI"));
 
         return \OAuth::consumer("GitHub", $creds);
     }
