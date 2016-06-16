@@ -61,7 +61,7 @@ $("#edit_classname").on("change", function(){
 
 $(document).on("change", ".edit_attribute", function(){
 	var c = UMLClasses[$("#edit_target").val()];
-	c.attributes[$(this).data("key")] = $(this).val();
+	c.attributes[$(this).data("key")].name = $(this).val();
 	c.render(c.selected);
 });
 
@@ -107,7 +107,7 @@ $("#edit_attributes_add").on("keyup", function(e){
 });
 
 function appendEditAttribute(key, value){
-	$("#edit_attributes").append('<div class="input-group"><input type="text" data-key="'+key+'" value="'+value+'" class="form-control edit_attribute"/><span class="input-group-btn"><button class="edit_attribute_del btn btn-danger" data-key="'+key+'">X</button></span></div>');
+	$("#edit_attributes").append('<div class="input-group"><input type="text" data-key="'+key+'" value="'+value.name+'" class="form-control edit_attribute"/><span class="input-group-btn"><button class="edit_attribute_del btn btn-danger" data-key="'+key+'">X</button></span></div>');
 }
 
 //////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ function appendEditAttribute(key, value){
 
 $(document).on("change", ".edit_function", function(){
 	var c = UMLClasses[$("#edit_target").val()];
-	c.functions[$(this).data("key")] = $(this).val();
+	c.functions[$(this).data("key")].name = $(this).val();
 	c.render(c.selected);
 });
 
@@ -165,5 +165,5 @@ $("#edit_functions_add").on("keyup", function(e){
 });
 
 function appendEditFunction(key, value){
-	$("#edit_functions").append('<div class="input-group"><input type="text" data-key="'+key+'" value="'+value+'" class="form-control edit_function"/><span class="input-group-btn"><button class="edit_function_del btn btn-danger" data-key="'+key+'">X</button></span></div>');
+	$("#edit_functions").append('<div class="input-group"><input type="text" data-key="'+key+'" value="'+value.name+'" class="form-control edit_function"/><span class="input-group-btn"><button class="edit_function_del btn btn-danger" data-key="'+key+'">X</button></span></div>');
 }

@@ -32,6 +32,10 @@ var UMLClass = function(config){
 	{
 		config.y = UMLClassY;
 	}
+	if(config.classType == undefined)
+	{
+		config.classType = "class";
+	}
 	this.className = className;
 	this.attributes = config.attributes;
 	this.functions = config.functions;
@@ -41,6 +45,7 @@ var UMLClass = function(config){
 	this.left = config.left;
 	this.x = config.x;
 	this.y = config.y;
+	this.classType = config.classType;
 	UMLClasses["class_"+this.id] = this;
 	this.render();
 };
@@ -48,6 +53,7 @@ var UMLClass = function(config){
 UMLClass.prototype = {
 	id: -1,
 	className: "Class",
+	classType: "class",
 	attributes: [],
 	functions: [],
 	relationships: [],
@@ -55,22 +61,16 @@ UMLClass.prototype = {
 	y: 0,
 	selected: false,
 	width: 200,
+	text_size: 6,
 	render: function(selected = false, moving = false){
 		this.selected = selected;
 		var y = 0;
 		var x = 0;
-		var nameHeight = 30;
+		var nameHeight = 45;
 		var attributesHeight = this.attributes.length * 15 + 10;
 		var functionsHeight = this.functions.length * 15 + 10;
 		var fullheight = nameHeight+attributesHeight+functionsHeight;
-		this.fullHeight = fullheight;
-		UMLClassY += this.fullHeight+10;
-		if(UMLClassY > 750)
-		{
-			UMLClassY = 10;
-			UMLClassX += this.width+10;
-		}
-		
+		this.fullHeight = fullheight;		
 
 		$("#class_"+this.id+"_parent").remove();
 
@@ -79,32 +79,87 @@ UMLClass.prototype = {
 			if(moving){
 				uml += " moving";
 			}
+			if(selected){
+				uml += " massmove";
+			}
 			uml += '" transform="matrix(1 0 0 1 '+this.x+' '+this.y+')" id="class_'+this.id+'">'+
 				'<g>';
 					if(selected){
 						uml += '<rect class="selected" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
 					}
-					uml += '<rect class="umlclass-name-rect" fill="#AA5439" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
-					'<rect class="umlclass-attributes-rect" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
-					'<rect class="umlclass-functions-rect" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';
+					uml += '<rect class="umlclass-name-rect" unselectable="on" fill="#AA5439" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
+					'<rect class="umlclass-attributes-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
+					'<rect class="umlclass-functions-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';
 			uml += '</g>'+
 				'<g>'+
-					'<text class="umlclass-name-text" text-anchor="middle" fill="black" stroke-width="0px" x="'+(x+100)+'" y="'+(y+15)+'">'+this.className+'</text>';
+					'<text class="umlclass-name-text" unselectable="on" text-anchor="middle" fill="black" stroke-width="0px" x="'+(x+this.width/2)+'" y="'+(y+15)+'">&lt;&lt;'+this.classType+'&gt;&gt;</text>';
+					uml += '<text class="umlclass-name-text" unselectable="on" text-anchor="middle" fill="black" stroke-width="0px" x="'+(x+this.width/2)+'" y="'+(y+30)+'">'+this.className+'</text>';
 					y += nameHeight+15;
-					$.each(this.attributes, function(key, attribute){
-						uml += '<text class="umlclass-attributes-text" fill="black" stroke-width="0px" x="'+(x+5)+'" y="'+y+'">'+attribute+'</text>';
+					$.each(this.attributes, (function(key, attribute){
+						var text = this.getVisibilityToken(attribute.visibility)+" "+attribute.name+" : "+attribute.type;
+						if(attribute.default != null)
+						{
+							text += " = "+attribute.default;
+						}
+						var extraAttributes = "";
+						if(attribute.isStatic || attribute.isFinal)
+						{
+							extraAttributes += " text-decoration='underline'";
+						}
+						uml += '<text class="umlclass-attributes-text" fill="black" stroke-width="0px" x="'+x+'" y="'+y+'" '+extraAttributes+'>'+text+'</text>';
 						y+=15;
-					})
+					}).bind(this));
 					y+=10;
-					$.each(this.functions, function(key, func){
-						uml += '<text class="umlclass-functions-text" fill="black" stroke-width="0px" x="'+(x+5)+'" y="'+y+'">'+func+'</text>';
+					$.each(this.functions, (function(key, func){
+						var text = this.getVisibilityToken(func.visibility)+" "+func.name+func.parameters;
+						
+						if(func.type != null)
+						{
+							text += " : "+func.type
+						}
+
+						var extraAttributes = "";
+						if(func.isStatic || func.isFinal)
+						{
+							extraAttributes += " text-decoration='underline'";
+						}
+
+						uml += '<text class="umlclass-functions-text" fill="black" stroke-width="0px" x="'+x+'" y="'+y+'" '+extraAttributes+'>'+text+'</text>';
 						y+=15;
-					})
+					}).bind(this));
 				'</g>'+
 			'</g>'+
 		'</svg>';
 
 		$(".umlcanvas").append(uml);
+
+		var addedClass = $("#class_"+this.id+"_parent");
+
+		var children = addedClass.find("text");
+
+		var max = 0;
+		$.each(children, function(key, child){
+			var length = child.getComputedTextLength();
+			if(length > max){
+				max = length;
+			}
+		});
+		this.width = max+10;
+
+		var width = this.width;
+		addedClass.find("rect").each(function(){
+			$(this).attr("width", width);
+		});
+		addedClass.find("text").each(function(){
+			console.log($(this).attr("text-anchor"), $(this).css("text-anchor"));
+			if($(this).attr("text-anchor") == "middle" || $(this).css("text-anchor") == "middle")
+			{
+				$(this).attr("x", x+(width/2));
+			}else{
+				$(this).attr("x", x);
+			}
+		});
+
 	},
 	destroy: function(){
 		$("#class_"+this.id+"_parent").remove();
@@ -153,10 +208,10 @@ UMLClass.prototype = {
 		var tr = this.topRight();
 		var bl = this.bottomLeft();
 		var br = this.bottomRight();
-		points.push(tl);
-		points.push(tr);
-		points.push(bl);
-		points.push(br);
+		// points.push(tl);
+		// points.push(tr);
+		// points.push(bl);
+		// points.push(br);
 		points.push(this.bottomMidPoint(br, bl));
 		points.push(this.topMidPoint(tl, tr));
 		points.push(this.leftMidPoint(tl, bl));
@@ -182,6 +237,48 @@ UMLClass.prototype = {
 		}
 
 		return closestPoint;
-	}
+	},
+	getVisibilityToken: function(visibility){
+		if(visibility == "private")
+		{
+			return "-";
+		}else if(visibility == "public")
+		{
+			return "+";
+		}else if(visibility == "protected")
+		{
+			return "#";
+		}
+	},
+	addRelationship: function(className){
+		var umlClass = null;
+		$.each(UMLClasses, function(key, value){
+			if(value.className == className)
+			{
+				umlClass = value;
+			}
+		});
+		if(umlClass == null)
+		{
+			console.log(className, "Not found");
+			return;
+		}
 
+		var emp = this.midPoint();
+		var smp = umlClass.midPoint();
+		var startPoint = this.findClosestConnection(emp.x, emp.y);
+		var endPoint = umlClass.findClosestConnection(smp.x, smp.y);
+
+		$(document).find("[data-end='class_"+this.id+"'][data-start='class_"+umlClass.id+"']").each(function(){
+			$(this).remove();
+		});
+		$(document).find("[data-start='class_"+this.id+"'][data-end='class_"+umlClass.id+"']").each(function(){
+			$(this).remove();
+		});
+
+		var path = '<svg height="5000" width="5000" data-start="class_'+this.id+'" data-end="class_'+umlClass.id+'">';
+			path += "<path class='line' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
+		path += '</svg>';
+		$(".umlcanvas").append(path);
+	}
 }

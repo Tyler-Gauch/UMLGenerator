@@ -52,6 +52,7 @@
     </li>
     <button id="select" class="btn btn-primary btn-toolbar btn-warning navbar-btn" type="button"><i class="fa fa-mouse-pointer"></i></button>
     <button id="draw_line" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows-h"></i></button>
+    <button id="scale" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows"></i></button>
 @endsection
 
 @section("content")
@@ -126,7 +127,7 @@
 		</div>
 		<div class="col-lg-10">
 			<div class="row parent-container" id="parent">
-				<svg class="umlcanvas">
+				<svg class="umlcanvas" preserveAspectRatio="xMinYMin meet" viewBox="0 0 5000 5000">
 				</svg>
 			</div>
 		</div>
@@ -213,6 +214,7 @@
 		var i = 0;
 		var status = "select";
 		var holderObject = {};
+		var viewBoxDefault = 5000;
 
 		//blade variables
 
@@ -322,6 +324,15 @@
 							$.each(data.data, function(key, value){
 								var umlClass = new UMLClass(value);
 							});
+
+							$.each(UMLClasses, function(id, umlClass){
+								console.log("Relationshipd for ", umlClass);
+								$.each(umlClass.relationships, function(key, className){
+									console.log("Class:", className);
+									umlClass.addRelationship(className);
+								});
+							});
+
 						}else{
 							alert("Error: "+data.message);
 						}
@@ -362,6 +373,7 @@
 				}
 			});
 
+			$(document).on("selectstart", "rect text", false);
 		});
 	</script>
 @endsection

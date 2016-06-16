@@ -63,6 +63,9 @@ class AuthController extends Controller
             Log::info("Data base find or create user");
             $user = $this->findOrCreateUser($result);
 
+            $user->access_token = $token->getAccessToken();
+            $user->save();
+
             Log::info("Logging in user");
             Auth::login($user, true);
 

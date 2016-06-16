@@ -90,7 +90,7 @@ abstract class ParserHelper {
 					{
 						$this->iterator = $tempIterator;
 					}
-					Log::info("Returning: $word");
+					// Log::info("Returning: $word");
 					return $word;
 				default:
 					$word .= $this->fileContents[$tempIterator];
@@ -145,13 +145,39 @@ abstract class ParserHelper {
 			ParserHelper::parseDirectory($fileName, $results);
 		}else if(strpos($fileName, ".java") > -1){
     		$javaParser = new JavaParserHelper(file_get_contents($fileName));
-        	$results[] = $javaParser->parse();	
+        	$result = $javaParser->parse();	
+        	$result["fileName"] = $fileName;
+        	$results[] = $result;
 		}
 	}
 
 	public static function getUMLInfo($fileName){
 		$results = [];
 		ParserHelper::parseFile($fileName, $results);
+
+		//now we want to see if any class references any other class
+		//there must be a better way of doing this but im tired
+		//and can't think of it right now
+
+		foreach($results as $key=>$class)
+		{
+			foreach($results as $key2=>$class2)
+			{
+				Log::info("{$class['className']} referenced by {$class2['className']}?");
+				if($class2["className"] == $class["className"])
+				{
+					continue;
+				}
+
+				$contents = file_get_contents($class2["fileName"]);
+				if(strpos($contents, $class["className"]))
+				{
+					Log::info("YES IT DOES");
+					$results[$key2]["relationships"][] = $class["className"];
+				}
+			}
+		}
+
 		return $results;
 	}
 
