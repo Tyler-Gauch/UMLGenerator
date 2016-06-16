@@ -90,7 +90,7 @@
 						<div class="row">
 							<label>Attributes:</label>
 						</div>
-						<div class="row" id="edit_attributes">
+						<div class="row" id="edit_attributes" style="height: 25%; overflow:scroll">
 						</div>
 						<div class="row">
 							<div class="input-group">
@@ -107,7 +107,7 @@
 						<div class="row">
 							<label>Functions:</label>
 						</div>
-						<div class="row" id="edit_functions">
+						<div class="row" id="edit_functions" style="height: 25%; overflow:scroll">
 						</div>
 						<div class="row">
 							<div class="input-group">
