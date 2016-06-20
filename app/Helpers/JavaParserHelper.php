@@ -209,7 +209,9 @@ class JavaParserHelper extends ParserHelper {
 					break;
 				case "import":
 					$r = $this->findNextNonKeyword();
-					$results["relationships"][] = str_replace(";", "", substr($r, -1*strrchr($r, ".")));
+					$r = str_replace(";", "", substr(strrchr($r, "."), 1));
+					if(!in_array($r, $results["relationships"]))
+					$results["relationships"][] = $r;
 					break;
 				case "implements":
 					$temp = $this->findNextNonKeyword();

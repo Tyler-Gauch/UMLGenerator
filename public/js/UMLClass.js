@@ -2,7 +2,6 @@ var UMLClassID = 0;
 var UMLClassX = 10;
 var UMLClassY = 10;
 var UMLClass = function(config){
-	console.log(config);
 	var className = config.className;
 	if(className == null || className == undefined || className == "")
 	{
@@ -46,6 +45,9 @@ var UMLClass = function(config){
 	this.x = config.x;
 	this.y = config.y;
 	this.classType = config.classType;
+	this.selected = false;
+	this.moving = false;
+	this.hover = false;
 	UMLClasses["class_"+this.id] = this;
 	this.render();
 };
@@ -62,8 +64,10 @@ UMLClass.prototype = {
 	selected: false,
 	width: 200,
 	text_size: 6,
-	render: function(selected = false, moving = false){
+	render: function(selected = false, moving = false, hover = false){
 		this.selected = selected;
+		this.moving = moving;
+		this.hover = hover;
 		var y = 0;
 		var x = 0;
 		var nameHeight = 45;
@@ -86,6 +90,9 @@ UMLClass.prototype = {
 				'<g>';
 					if(selected){
 						uml += '<rect class="selected" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
+					}
+					if(hover){
+						uml += '<rect class="hover" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
 					}
 					uml += '<rect class="umlclass-name-rect" unselectable="on" fill="#AA5439" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
 					'<rect class="umlclass-attributes-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
@@ -151,7 +158,6 @@ UMLClass.prototype = {
 			$(this).attr("width", width);
 		});
 		addedClass.find("text").each(function(){
-			console.log($(this).attr("text-anchor"), $(this).css("text-anchor"));
 			if($(this).attr("text-anchor") == "middle" || $(this).css("text-anchor") == "middle")
 			{
 				$(this).attr("x", x+(width/2));
@@ -160,6 +166,18 @@ UMLClass.prototype = {
 			}
 		});
 
+		$("[data-end='class_"+this.id+"']").each(function(value){
+			if(hover)
+				$(this).children().addClass("hover");
+			else
+				$(this).children().removeClass("hover");
+		});
+		$("[data-start='class_"+this.id+"']").each(function(value){
+			if(hover)
+				$(this).children().addClass("hover");
+			else
+				$(this).children().removeClass("hover");
+		});
 	},
 	destroy: function(){
 		$("#class_"+this.id+"_parent").remove();
@@ -260,7 +278,9 @@ UMLClass.prototype = {
 		});
 		if(umlClass == null)
 		{
-			console.log(className, "Not found");
+			this.relationships = $.grep(this.relationships, function(value){
+				return value != className;
+			});
 			return;
 		}
 
@@ -276,8 +296,14 @@ UMLClass.prototype = {
 			$(this).remove();
 		});
 
+		var classes = "line";
+		if(this.hover || ulmClass.hover)
+		{
+			classes += " hover";
+		}
+
 		var path = '<svg height="5000" width="5000" data-start="class_'+this.id+'" data-end="class_'+umlClass.id+'">';
-			path += "<path class='line' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
+			path += "<path class='"+classes+"' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
 		path += '</svg>';
 		$(".umlcanvas").append(path);
 	}

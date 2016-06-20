@@ -326,12 +326,12 @@
 							});
 
 							$.each(UMLClasses, function(id, umlClass){
-								console.log("Relationshipd for ", umlClass);
 								$.each(umlClass.relationships, function(key, className){
-									console.log("Class:", className);
 									umlClass.addRelationship(className);
 								});
 							});
+
+							autoAlignClasses();
 
 						}else{
 							alert("Error: "+data.message);
@@ -374,6 +374,73 @@
 			});
 
 			$(document).on("selectstart", "rect text", false);
+
+			$(document).on("mouseover", ".umlclass", function(e){
+				if(holderObject["hovering"] == undefined)
+				{
+					holderObject["hovering"] = true;
+					var c = UMLClasses[$(this).attr("id")];
+					c.render(c.selected, false, true);
+				}
+			});
+
+			$(document).on("mouseleave", ".umlclass", function(e){
+				delete holderObject["hovering"];
+				var c = UMLClasses[$(this).attr("id")];
+				if(!c.moving && !e.ctrlKey)
+					c.render(c.selected);
+			});
+
+			function autoAlignClasses(){
+
+				console.log("Auto Aligning Classes");
+
+				var relationships = {};
+
+				var relationshipsLength = 0;
+				var totalRelationships = 0;
+
+				$.each(UMLClasses, function(id, umlClass){
+
+					var index = umlClass.relationships.length
+					if(relationships[index] == undefined){
+						relationships[index] = [];
+						relationshipsLength++;
+					}
+
+					totalRelationships += index;
+					relationships[index].push(umlClass); 
+
+				});
+
+				console.log(relationships);
+
+				//we can center the largest one in the middle of the screen
+
+				while(relationshipsLength > 0)
+				{
+					var maxKey = -1;
+					for(var relationshipCount in relationships)
+					{
+						relationshipCount = parseInt(relationshipCount);
+						if(relationshipCount > maxKey)
+						{
+							maxKey = relationshipCount;
+						}
+					}
+
+					var current = relationships[maxKey];
+					delete relationships[maxKey];
+					relationshipsLength--;
+					
+					$.each(current, function(key, umlClass){
+
+						
+
+					});
+				}
+
+			}
 		});
 	</script>
 @endsection

@@ -55,6 +55,10 @@
 	stroke-width: 5px;
 	stroke: #00F;
 }
+.hover{
+	stroke-width: 5px !important;
+	stroke: #0F0 !important;
+}
 
 .btn-toolbar{
 	padding-left: 8px;
