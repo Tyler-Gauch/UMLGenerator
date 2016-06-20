@@ -297,7 +297,7 @@ UMLClass.prototype = {
 		});
 
 		var classes = "line";
-		if(this.hover || ulmClass.hover)
+		if(this.hover || umlClass.hover)
 		{
 			classes += " hover";
 		}
