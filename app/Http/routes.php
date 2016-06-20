@@ -17,8 +17,7 @@ Route::group(["prefix" => "/auth"], function(){
 	Route::get('/logout', 'Auth\AuthController@getLogout');
 });
 
-// Route::group(["middleware" => 'auth'], function(){
-Route::group([], function(){
+Route::group(["middleware" => 'auth'], function(){
 	Route::get('/{project?}', "DashboardController@index");
 
 	Route::post("/parser/java", "ParserController@javaParser");
