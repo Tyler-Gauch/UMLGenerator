@@ -125,10 +125,12 @@ $(document).ready(function(){
 		if(status == "select")
 		{
 			$("#edit_form").addClass("hidden");
-			var c = UMLClasses[$("#edit_target").val()];
-			if(c != null){
-				$("#"+$("#edit_target").val()).removeClass("massmove");
-			}
+			$(".umlclass.massmove").each(function(){
+				UMLClasses[$(this).attr("id")]
+					.unselect()
+					.unhover()
+					.getNode().removeClass("massmove");
+			});
 		}
 	});
 

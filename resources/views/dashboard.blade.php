@@ -376,11 +376,11 @@
 			$(document).on("selectstart", "rect text", false);
 
 			$(document).on("mouseover", ".umlclass", function(e){
-				if(holderObject["hovering"] == undefined)
+				var c = UMLClasses[$(this).attr("id")];
+				if(holderObject["hovering"] == undefined && !c.moving)
 				{
 					holderObject["hovering"] = true;
-					$("#rect_hover_"+$(this).attr("id")).addClass("hover");
-					
+					c.hover();
 				}
 			});
 
@@ -388,7 +388,7 @@
 				delete holderObject["hovering"];
 				var c = UMLClasses[$(this).attr("id")];
 				if(!c.moving && !e.ctrlKey){
-					$("#rect_hover_"+$(this).attr("id")).removeClass("hover");
+					c.unhover();
 				}
 			});
 
