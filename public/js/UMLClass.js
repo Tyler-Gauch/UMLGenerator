@@ -80,20 +80,20 @@ UMLClass.prototype = {
 
 		var uml = '<svg id="class_'+this.id+'_parent">'+
 			'<g class="umlclass';
-			if(moving){
-				uml += " moving";
-			}
-			if(selected){
-				uml += " massmove";
-			}
+			// if(moving){
+			// 	uml += " moving";
+			// }
+			// if(selected){
+			// 	uml += " massmove";
+			// }
 			uml += '" transform="matrix(1 0 0 1 '+this.x+' '+this.y+')" id="class_'+this.id+'">'+
 				'<g>';
-					if(selected){
-						uml += '<rect class="selected" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
-					}
-					if(hover){
-						uml += '<rect class="hover" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
-					}
+					// if(selected){
+						uml += '<rect id="rect_select_class_'+this.id+'" class="" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
+					// }
+					// if(hover){
+						uml += '<rect id="rect_hover_class_'+this.id+'" class="" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
+					// }
 					uml += '<rect class="umlclass-name-rect" unselectable="on" fill="#AA5439" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
 					'<rect class="umlclass-attributes-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
 					'<rect class="umlclass-functions-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';

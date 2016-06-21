@@ -379,16 +379,17 @@
 				if(holderObject["hovering"] == undefined)
 				{
 					holderObject["hovering"] = true;
-					var c = UMLClasses[$(this).attr("id")];
-					c.render(c.selected, false, true);
+					$("#rect_hover_"+$(this).attr("id")).addClass("hover");
+					
 				}
 			});
 
 			$(document).on("mouseleave", ".umlclass", function(e){
 				delete holderObject["hovering"];
 				var c = UMLClasses[$(this).attr("id")];
-				if(!c.moving && !e.ctrlKey)
-					c.render(c.selected);
+				if(!c.moving && !e.ctrlKey){
+					$("#rect_hover_"+$(this).attr("id")).removeClass("hover");
+				}
 			});
 
 			function autoAlignClasses(){

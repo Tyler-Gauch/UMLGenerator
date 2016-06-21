@@ -43,7 +43,7 @@ $(document).ready(function(){
 				$("#"+status).removeClass("btn-warning");
 				$("html, body").css("cursor", "");
 				holderObject = {};
-				$("#edit_form").addClass("hidden");
+				// $("#edit_form").addClass("hidden");
 			}
 			status = $(this).attr("id");
 			$(this).addClass("btn-warning");
@@ -127,7 +127,7 @@ $(document).ready(function(){
 			$("#edit_form").addClass("hidden");
 			var c = UMLClasses[$("#edit_target").val()];
 			if(c != null){
-				c.render();
+				$("#"+$("#edit_target").val()).removeClass("massmove");
 			}
 		}
 	});
