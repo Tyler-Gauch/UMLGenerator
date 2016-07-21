@@ -1,6 +1,25 @@
 var UMLClassID = 0;
 var UMLClassX = 10;
 var UMLClassY = 10;
+var UMLClassSaveURL;
+
+var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
+	
+	var postData = {};
+	var k = 0;
+	$.each(UMLClasses, function(key, value){
+		postData[k++] = value.serialize(); 
+	});
+
+	$.ajax({
+		url: UMLClassSaveURL,
+		method: "POST",
+		data: postData,
+		success: successCB,
+		fail: failCB
+	});
+}
+
 var UMLClass = function(config){
 	var className = config.className;
 	if(className == null || className == undefined || className == "")
@@ -326,5 +345,25 @@ UMLClass.prototype = {
 	},
 	getNode: function(){
 		return $("#class_"+this.id);
+	},
+	serialize: function(){
+		return {
+			x: this.x,
+			y: this.y,
+			className: this.className,
+			type: this.classType,
+			attributes: this.attributes,
+			functions: this.functions,
+			relationships: this.relationships
+		};
+	},
+	save: function(successCB = function(){}, failCB = function(){}){
+		$.ajax({
+			url: UMLClassSaveURL,
+			method: method,
+			data: this.serialize(),
+			success: successCB,
+			fail: failCB
+		});
 	}
 }

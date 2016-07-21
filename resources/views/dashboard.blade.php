@@ -61,14 +61,16 @@
 			<div class="row">
 				@if(isset($project))
 					<legend id="project_name">{{$project->name}}</legend>
-					<div class="col-lg-12">
-						<select id="change_project_branch" class="form-control">
-							<option value="null" selected>Please Choose A Branch</option>
-							@foreach($branches as $key=>$branch)
-								<option value="{{ $branch->name }}">{{$branch->name}}</option>
-							@endforeach
-						</select>
-					</div>
+					@if(isset($branches))
+						<div class="col-lg-12">
+							<select id="change_project_branch" class="form-control">
+								<option value="null" selected>Please Choose A Branch</option>
+								@foreach($branches as $key=>$branch)
+									<option value="{{ $branch->name }}">{{$branch->name}}</option>
+								@endforeach
+							</select>
+						</div>
+					@endif
 				@endif
 				<div class="col-lg-12">
 				</div>
@@ -142,15 +144,51 @@
 	      </div>
 	      <div class="modal-body">
 	      	<div class="row">
+	      		<div class="col-lg-12">
+	      			<div class="form-group">
+	      				<div class="col-lg-4">
+	      					<label>Project Type:</label>
+	      				</div>
+	      				<div class="col-lg-8">
+	      					<select id="new_project_type" class="form-control">
+	      						<option value="null">Please Choose a Project Type</option>
+	      						<option value="empty">Empty Project</option>
+	      						<option value="github">Github Project</option>
+	      					</select>
+	      				</div>
+	      			</div>
+	      		</div>
+	      	</div>
+	      	<div class="row hidden" id="new_empty_project">
+	      		<div class="form-group">
+	        		<div class="col-lg-4">
+	        			<label>Project Name:</label>
+	        		</div>
+	        		<div class="col-lg-8">
+		        		<input type="text" id="new_project_name" class="form-control" />
+	        		</div>		        		
+	        	</div>
+	      	</div>
+	      	<div class="row hidden" id="new_git_project">
 		        <div class="col-lg-12">
 		        	<div class="form-group">
 		        		<div class="col-lg-4">
-		        			<label>Repository</label>
+		        			<label>Repository:</label>
 		        		</div>
 		        		<div class="col-lg-8">
-		        			<select id="new_project_repo" class="form-control">
-		        			</select>
-		        		</div>
+		        			<div class="row">
+		        				<div class="col-lg-12">
+				        			<select id="new_project_repo" class="form-control">
+				        			</select>
+			        			</div>
+			        			<div class="col-lg-12" style="text-align: center">
+			        			OR
+			        			</div>
+		        				<div class="col-lg-12">
+			        				<input type="text" id="new_project_url" class="form-control" placeholder="Public Github URL" />
+		        				</div>
+		        			</div>
+		        		</div>		        		
 		        	</div>
 		        </div>
 		        <div class="col-lg-12">
@@ -169,7 +207,7 @@
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary" id="new_project_create">Create Project</button>
+	        <button type="button" class="btn btn-primary hidden" id="new_project_create">Create Project</button>
 	      </div>
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
@@ -215,6 +253,7 @@
 		var status = "select";
 		var holderObject = {};
 		var viewBoxDefault = 5000;
+		UMLClassSaveURL = "/";
 
 		//blade variables
 
@@ -228,11 +267,39 @@
 		{
 			return {x: (x1+x2)/2, y: (y1+y2)/2}
 		}
-
 	</script>
 
 	<script src="/js/UMLClass.js"></script>
 	<script src="/js/editForm.js"></script>
 	<script src="/js/umlClassMovement.js"></script>
 	<script src="/dashboard/dashboard.js"></script>
+
+	<script>
+		
+		$(document).ready(function(){
+			$("#save_project").on("click", function(){
+				UMLClassSaveAll();
+			});
+		});
+
+		$("#new_project_type").on("change", function(){
+			var type = $(this).val();
+
+			if(type == "null")
+			{
+				$("#new_git_project").addClass("hidden");
+				$("#new_empty_project").addClass("hidden");
+				$("#new_project_create").addClass("hidden");
+			}else if(type == "empty"){
+				$("#new_empty_project").removeClass("hidden");
+				$("#new_git_project").addClass("hidden");
+				$("#new_project_create").removeClass("hidden");
+			}else if(type == "github"){
+				$("#new_git_project").removeClass("hidden");
+				$("#new_empty_project").addClass("hidden");
+				$("#new_project_create").removeClass("hidden");
+			}
+		});
+
+	</script>
 @endsection

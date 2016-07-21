@@ -190,18 +190,43 @@ $(document).ready(function(){
 	$("#new_project_create").on("click", function(e){
 		e.preventDefault();
 
+		var type = $("#new_project_type").val();
+		var url = $("#new_project_url").val();
+		var projectName = $("#new_project_name").val();
 		var id = $("#new_project_repo").val();
 		var language = $("#new_project_language").val();
-		var name = $("#new_project_repo").val();
+		var repoName = $("#new_project_repo").val();
+
+		var postData = {type: type};
+
+		if(type == "null")
+		{
+			return;
+		}else if(type == "empty"){
+			postData["name"] = projectName;
+		}else if(type == "github"){
+			if(repoName != "null")
+			{
+				postData["repoName"] = repoName;
+				postData["language"] = language;
+			}else{
+				postData["repoUrl"] = url;
+			}
+		}
 
 		$.ajax({
 			method: "POST",
 			url: "/project/create",
-			data: {name: name, language: language},
+			data: postData,
 			success: function(data){
 				if(data.success)
 				{
-					window.location = "/"+name;
+					if(type == "empty")
+					{
+						window.location = "/"+projectName;
+					}else{
+						window.location = "/"+repoName;
+					}
 				}else{
 					alert("Error:"+data.message);
 				}
