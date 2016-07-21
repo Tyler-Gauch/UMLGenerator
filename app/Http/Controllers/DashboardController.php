@@ -31,17 +31,18 @@ class DashboardController extends Controller
 
    		$repos = $github->listRepos();
 
-		$info = [];
+   		$info = [];
 
-		foreach($repos as $key=>$repo){
-			$info[] = $repo->name;
-		}
+   		foreach($repos as $key=>$repo){
+   			$info[] = $repo->name;
+   		}
 
-		return response()->json(["success" => true, "repos" => $info]);
+         return response()->json(["success" => true, "repos" => $info]);
    	}
 
    	public function listBranches(Request $request)
    	{
+
    		$github = new GitHubHelper(Auth::user());
 
    		$repo = $request->input("repo", null);

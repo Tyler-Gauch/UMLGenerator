@@ -77,6 +77,7 @@ class AuthController extends Controller
     }
 
     private function getGithubService(){
+        Log::info("getGithubService()");
         $creds = new Credentials(env("GITHUB_CLIENT_ID"), env("GITHUB_CLIENT_SECRET"), env("GITHUB_REDIRECT_URI"));
 
         return \OAuth::consumer("GitHub", $creds);

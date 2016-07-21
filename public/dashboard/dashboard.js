@@ -11,6 +11,10 @@ $(document).ready(function(){
 			  }).get(0).dispatchEvent(evt);
 		});
 
+		$("#save_project").on("click", function() {
+			console.log("Save clicked");
+		});
+
 		$(".umlcanvas").on("contextmenu", function(e){
 			if(status == "draw_line"){
 				e.preventDefault();
