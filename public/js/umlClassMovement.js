@@ -148,12 +148,5 @@ function moveRelationShip($this){
 	var startPoint = cStart.findClosestConnection(emp.x, emp.y);
 	var endPoint = cEnd.findClosestConnection(smp.x, smp.y);
 
-	// $this.remove();
-
 	$this.find("path").attr("d", "M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y);
-
-	// var path = '<svg height="5000" width="5000" data-start="class_'+cStart.id+'" data-end="class_'+cEnd.id+'">';
-	// 	path += "<path class='line' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
-	// path += '</svg>';
-	// $(".umlcanvas").append(path);
 }
