@@ -61,14 +61,16 @@
 			<div class="row">
 				@if(isset($project))
 					<legend id="project_name">{{$project->name}}</legend>
-					<div class="col-lg-12">
-						<select id="change_project_branch" class="form-control">
-							<option value="null" selected>Please Choose A Branch</option>
-							@foreach($branches as $key=>$branch)
-								<option value="{{ $branch->name }}">{{$branch->name}}</option>
-							@endforeach
-						</select>
-					</div>
+					@if(isset($branches))
+						<div class="col-lg-12">
+							<select id="change_project_branch" class="form-control">
+								<option value="null" selected>Please Choose A Branch</option>
+								@foreach($branches as $key=>$branch)
+									<option value="{{ $branch->name }}">{{$branch->name}}</option>
+								@endforeach
+							</select>
+						</div>
+					@endif
 				@endif
 				<div class="col-lg-12">
 				</div>
@@ -142,15 +144,51 @@
 	      </div>
 	      <div class="modal-body">
 	      	<div class="row">
+	      		<div class="col-lg-12">
+	      			<div class="form-group">
+	      				<div class="col-lg-4">
+	      					<label>Project Type:</label>
+	      				</div>
+	      				<div class="col-lg-8">
+	      					<select id="new_project_type" class="form-control">
+	      						<option value="null">Please Choose a Project Type</option>
+	      						<option value="empty">Empty Project</option>
+	      						<option value="github">Github Project</option>
+	      					</select>
+	      				</div>
+	      			</div>
+	      		</div>
+	      	</div>
+	      	<div class="row hidden" id="new_empty_project">
+	      		<div class="form-group">
+	        		<div class="col-lg-4">
+	        			<label>Project Name:</label>
+	        		</div>
+	        		<div class="col-lg-8">
+		        		<input type="text" id="new_project_name" class="form-control" />
+	        		</div>		        		
+	        	</div>
+	      	</div>
+	      	<div class="row hidden" id="new_git_project">
 		        <div class="col-lg-12">
 		        	<div class="form-group">
 		        		<div class="col-lg-4">
-		        			<label>Repository</label>
+		        			<label>Repository:</label>
 		        		</div>
 		        		<div class="col-lg-8">
-		        			<select id="new_project_repo" class="form-control">
-		        			</select>
-		        		</div>
+		        			<div class="row">
+		        				<div class="col-lg-12">
+				        			<select id="new_project_repo" class="form-control">
+				        			</select>
+			        			</div>
+			        			<div class="col-lg-12" style="text-align: center">
+			        			OR
+			        			</div>
+		        				<div class="col-lg-12">
+			        				<input type="text" id="new_project_url" class="form-control" placeholder="Public Github URL" />
+		        				</div>
+		        			</div>
+		        		</div>		        		
 		        	</div>
 		        </div>
 		        <div class="col-lg-12">
@@ -169,7 +207,7 @@
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary" id="new_project_create">Create Project</button>
+	        <button type="button" class="btn btn-primary hidden" id="new_project_create">Create Project</button>
 	      </div>
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
@@ -215,6 +253,7 @@
 		var status = "select";
 		var holderObject = {};
 		var viewBoxDefault = 5000;
+		UMLClassSaveURL = "/";
 
 		//blade variables
 
@@ -228,219 +267,39 @@
 		{
 			return {x: (x1+x2)/2, y: (y1+y2)/2}
 		}
-
 	</script>
 
 	<script src="/js/UMLClass.js"></script>
 	<script src="/js/editForm.js"></script>
 	<script src="/js/umlClassMovement.js"></script>
 	<script src="/dashboard/dashboard.js"></script>
+
 	<script>
+		
 		$(document).ready(function(){
-
-			$(".new_project").on("click", function(e){
-				e.preventDefault();
-
-				getRepoNames(function(data){
-					if(data.success)
-					{
-						var modal = $("#new_project_modal");
-						var repoList = $("#new_project_repo");
-
-						repoList.empty();
-						repoList.append("<option value='null'>Please Select a Repository</option>");
-
-						$.each(data.repos, function(key, value){
-							repoList.append("<option value='"+value+"'>"+value+"</option>");
-						});
-
-						modal.modal("show");
-					}
-				});
-				
+			$("#save_project").on("click", function(){
+				UMLClassSaveAll();
 			});
+		});
 
-			$("#new_project_create").on("click", function(e){
-				e.preventDefault();
+		$("#new_project_type").on("change", function(){
+			var type = $(this).val();
 
-				var id = $("#new_project_repo").val();
-				var language = $("#new_project_language").val();
-				var name = $("#new_project_repo").val();
-
-				$.ajax({
-					method: "POST",
-					url: "/project/create",
-					data: {name: name, language: language},
-					success: function(data){
-						if(data.success)
-						{
-							window.location = "/"+name;
-						}else{
-							alert("Error:"+data.message);
-						}
-					}
-				});
-			});
-
-			function getRepoNames(callback){
-				$.ajax({
-					method:"POST",
-					url: "/repo/list",
-					success: function(data){
-						callback(data);
-					}
-				});
-			}
-
-			function getBranchNames(callback)
+			if(type == "null")
 			{
-				$.ajax({
-					method: "POST",
-					url: "/branch/list",
-					data: {repo: repo},
-					success: function(data){
-						callback(data);
-					}
-				});
-			}
-
-			function getProjects(callback){
-				$.ajax({
-					method: "GET",
-					url: "/project/get",
-					success: function(data){
-						callback(data);
-					}
-				});
-			}
-
-			$("#change_project_branch").on("change", function(e){
-				$.ajax({
-					url: "/parser/"+$("#project_name").text()+"/"+$(this).val(),
-					method: "GET",
-					success: function(data){
-						if(data.success)
-						{
-							$.each(data.data, function(key, value){
-								var umlClass = new UMLClass(value);
-							});
-
-							$.each(UMLClasses, function(id, umlClass){
-								$.each(umlClass.relationships, function(key, className){
-									umlClass.addRelationship(className);
-								});
-							});
-
-							autoAlignClasses();
-
-						}else{
-							alert("Error: "+data.message);
-						}
-					}
-				});
-			});
-
-			$(".open_project").on("click", function(e){
-				e.preventDefault();
-
-				getProjects(function(data){
-					if(data.success){
-						var modal = $("#open_project_modal");
-						var projects = $("#open_project_name");
-
-						projects.empty();
-						projects.append("<option value='null'>Please select a Project</option>");
-
-						$.each(data.projects, function(key, value){
-							projects.append("<option value='"+value.name+"'>"+value.name+"</option>");
-						});
-
-						modal.modal("show");
-					}
-				});
-			});
-
-			$("#open_project_button").on("click", function(e){
-				e.preventDefault();
-
-				var project = $("#open_project_name").val();
-
-				if(project == null || project == "null")
-				{
-					alert("Please select a project");
-				}else{
-					window.location = "/"+project;
-				}
-			});
-
-			$(document).on("selectstart", "rect text", false);
-
-			$(document).on("mouseover", ".umlclass", function(e){
-				if(holderObject["hovering"] == undefined)
-				{
-					holderObject["hovering"] = true;
-					var c = UMLClasses[$(this).attr("id")];
-					c.render(c.selected, false, true);
-				}
-			});
-
-			$(document).on("mouseleave", ".umlclass", function(e){
-				delete holderObject["hovering"];
-				var c = UMLClasses[$(this).attr("id")];
-				if(!c.moving && !e.ctrlKey)
-					c.render(c.selected);
-			});
-
-			function autoAlignClasses(){
-
-				console.log("Auto Aligning Classes");
-
-				var relationships = {};
-
-				var relationshipsLength = 0;
-				var totalRelationships = 0;
-
-				$.each(UMLClasses, function(id, umlClass){
-
-					var index = umlClass.relationships.length
-					if(relationships[index] == undefined){
-						relationships[index] = [];
-						relationshipsLength++;
-					}
-
-					totalRelationships += index;
-					relationships[index].push(umlClass); 
-
-				});
-
-				console.log(relationships);
-
-				//we can center the largest one in the middle of the screen
-
-				while(relationshipsLength > 0)
-				{
-					var maxKey = -1;
-					for(var relationshipCount in relationships)
-					{
-						relationshipCount = parseInt(relationshipCount);
-						if(relationshipCount > maxKey)
-						{
-							maxKey = relationshipCount;
-						}
-					}
-
-					var current = relationships[maxKey];
-					delete relationships[maxKey];
-					relationshipsLength--;
-					
-					$.each(current, function(key, umlClass){
-
-						
-
-					});
-				}
-
+				$("#new_git_project").addClass("hidden");
+				$("#new_empty_project").addClass("hidden");
+				$("#new_project_create").addClass("hidden");
+			}else if(type == "empty"){
+				$("#new_empty_project").removeClass("hidden");
+				$("#new_git_project").addClass("hidden");
+				$("#new_project_create").removeClass("hidden");
+			}else if(type == "github"){
+				$("#new_git_project").removeClass("hidden");
+				$("#new_empty_project").addClass("hidden");
+				$("#new_project_create").removeClass("hidden");
 			}
 		});
+
 	</script>
 @endsection

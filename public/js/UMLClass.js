@@ -1,6 +1,25 @@
 var UMLClassID = 0;
 var UMLClassX = 10;
 var UMLClassY = 10;
+var UMLClassSaveURL;
+
+var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
+	
+	var postData = {};
+	var k = 0;
+	$.each(UMLClasses, function(key, value){
+		postData[k++] = value.serialize(); 
+	});
+
+	$.ajax({
+		url: UMLClassSaveURL,
+		method: "POST",
+		data: postData,
+		success: successCB,
+		fail: failCB
+	});
+}
+
 var UMLClass = function(config){
 	var className = config.className;
 	if(className == null || className == undefined || className == "")
@@ -47,7 +66,7 @@ var UMLClass = function(config){
 	this.classType = config.classType;
 	this.selected = false;
 	this.moving = false;
-	this.hover = false;
+	this.hovering = false;
 	UMLClasses["class_"+this.id] = this;
 	this.render();
 };
@@ -64,10 +83,7 @@ UMLClass.prototype = {
 	selected: false,
 	width: 200,
 	text_size: 6,
-	render: function(selected = false, moving = false, hover = false){
-		this.selected = selected;
-		this.moving = moving;
-		this.hover = hover;
+	render: function(){
 		var y = 0;
 		var x = 0;
 		var nameHeight = 45;
@@ -80,20 +96,9 @@ UMLClass.prototype = {
 
 		var uml = '<svg id="class_'+this.id+'_parent">'+
 			'<g class="umlclass';
-			if(moving){
-				uml += " moving";
-			}
-			if(selected){
-				uml += " massmove";
-			}
 			uml += '" transform="matrix(1 0 0 1 '+this.x+' '+this.y+')" id="class_'+this.id+'">'+
 				'<g>';
-					if(selected){
-						uml += '<rect class="selected" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
-					}
-					if(hover){
-						uml += '<rect class="hover" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
-					}
+					uml += '<rect id="rect_hover_class_'+this.id+'" class="" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+fullheight+'"></rect>';
 					uml += '<rect class="umlclass-name-rect" unselectable="on" fill="#AA5439" x="'+x+'" y="'+y+'" width="'+this.width+'" height="'+nameHeight+'"></rect>'+
 					'<rect class="umlclass-attributes-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight)+'" width="'+this.width+'" height="'+attributesHeight+'"></rect>'+
 					'<rect class="umlclass-functions-rect" unselectable="on" fill="#FF7144" stroke-width="1px" stroke="#000" x="'+x+'" y="'+(y+nameHeight+attributesHeight)+'" width="'+this.width+'" height="'+functionsHeight+'"></rect>';
@@ -164,19 +169,6 @@ UMLClass.prototype = {
 			}else{
 				$(this).attr("x", x);
 			}
-		});
-
-		$("[data-end='class_"+this.id+"']").each(function(value){
-			if(hover)
-				$(this).children().addClass("hover");
-			else
-				$(this).children().removeClass("hover");
-		});
-		$("[data-start='class_"+this.id+"']").each(function(value){
-			if(hover)
-				$(this).children().addClass("hover");
-			else
-				$(this).children().removeClass("hover");
 		});
 	},
 	destroy: function(){
@@ -289,15 +281,22 @@ UMLClass.prototype = {
 		var startPoint = this.findClosestConnection(emp.x, emp.y);
 		var endPoint = umlClass.findClosestConnection(smp.x, smp.y);
 
+		var exists = false;
+
 		$(document).find("[data-end='class_"+this.id+"'][data-start='class_"+umlClass.id+"']").each(function(){
-			$(this).remove();
+			exists = true;
 		});
 		$(document).find("[data-start='class_"+this.id+"'][data-end='class_"+umlClass.id+"']").each(function(){
-			$(this).remove();
+			exists = true;
 		});
 
+		if(exists)
+		{
+			return;
+		}
+
 		var classes = "line";
-		if(this.hover || umlClass.hover)
+		if(this.hovering || umlClass.hovering)
 		{
 			classes += " hover";
 		}
@@ -306,5 +305,65 @@ UMLClass.prototype = {
 			path += "<path class='"+classes+"' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
 		path += '</svg>';
 		$(".umlcanvas").append(path);
+
+	},
+	select: function(){
+		this.selected = true;
+		$("#rect_hover_class_"+this.id).addClass("selected");
+		return this;
+	},
+	unselect: function(){
+		this.selected = false;
+		$("#rect_hover_class_"+this.id).removeClass("selected");
+		return this;
+	},
+	hover: function(){
+		this.hovering = true;
+		$("#rect_hover_class_"+this.id).addClass("hover");
+
+		$("[data-end='class_"+this.id+"']").each(function(value){
+			$(this).children().addClass("hover");
+		});
+		$("[data-start='class_"+this.id+"']").each(function(value){
+			$(this).children().addClass("hover");
+		});
+
+		return this;
+	},
+	unhover: function(){
+		this.hovering = false;
+		$("#rect_hover_class_"+this.id).removeClass("hover");
+
+		$("[data-end='class_"+this.id+"']").each(function(value){
+			$(this).children().removeClass("hover");
+		});
+		$("[data-start='class_"+this.id+"']").each(function(value){
+			$(this).children().removeClass("hover");
+		});
+
+		return this;
+	},
+	getNode: function(){
+		return $("#class_"+this.id);
+	},
+	serialize: function(){
+		return {
+			x: this.x,
+			y: this.y,
+			className: this.className,
+			type: this.classType,
+			attributes: this.attributes,
+			functions: this.functions,
+			relationships: this.relationships
+		};
+	},
+	save: function(successCB = function(){}, failCB = function(){}){
+		$.ajax({
+			url: UMLClassSaveURL,
+			method: method,
+			data: this.serialize(),
+			success: successCB,
+			fail: failCB
+		});
 	}
 }

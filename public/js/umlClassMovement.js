@@ -9,15 +9,24 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 	}
 	if(e.which == 1)
 	{
-		if($("#edit_target").val() != "null" && !e.ctrlKey)
-			UMLClasses[$("#edit_target").val()].render();
+		if($("#edit_target").val() != "null" && !e.ctrlKey){
+			var et = UMLClasses[$("#edit_target").val()]
+				.unselect()
+				.unhover()
+				.getNode()
+				.removeClass("massmove");
+		}
 		else if(e.ctrlKey)
 		{
 			$("#edit_target").val("null");
 		}
 
 		var c = UMLClasses[$(this).attr("id")];
-		c.render(true, true);
+		
+		$(this).addClass("massmove");
+		c.select();
+		c.moving = true;
+
 		currentX = e.clientX;
 		currentY = e.clientY;
 		
@@ -34,7 +43,8 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 		if(e.ctrlKey)
 		{
 			$(".umlclass.massmove").each(function(){
-				UMLClasses[$(this).attr("id")].render(true, true);
+				var c = UMLClasses[$(this).attr("id")].unhover();
+				c.moving = true;
 				var currentMatrix = $(this).attr("transform").slice(7,-1).split(" ");
 				for(var i = 0; i < currentMatrix.length; i++)
 				{
@@ -55,7 +65,10 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 				{
 					return;
 				}
-				UMLClasses[$(this).attr("id")].render();
+				var c = UMLClasses[$(this).attr("id")];
+				c.moving = false;
+				$(this).removeClass("massmove");
+				
 			});
 			$("#edit_classname").val(c.className);
 			$("#edit_target").val($(this).attr("id"));
@@ -76,7 +89,14 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 });
 
 $(document).on("mousemove touchmove", function(e){
-	$(".umlclass.moving").each(function(){
+	$(".umlclass.massmove").each(function(){
+		var c = UMLClasses[$(this).attr("id")];
+
+		if(!c.moving)
+		{
+			return;
+		}
+
 		var viewBoxValue = parseInt($(".umlcanvas")[0].getAttribute("viewBox").split(" ")[2]);
 		var dx = (e.clientX - currentX) * (viewBoxValue/viewBoxDefault);
 		var dy = (e.clientY - currentY) * (viewBoxValue/viewBoxDefault);
@@ -84,7 +104,6 @@ $(document).on("mousemove touchmove", function(e){
 		var currentMatrix = holderObject["currentMatrix"][$(this).attr("id")];
 		currentMatrix[4] += dx;
 		currentMatrix[5] += dy;
-		var c = UMLClasses[$(this).attr("id")];
 		c.x = currentMatrix[4];
 		c.y = currentMatrix[5];
 		var newMatrix = "matrix("+currentMatrix.join(" ") + ")";
@@ -103,9 +122,21 @@ $(document).on("mousemove touchmove", function(e){
 });
 
 $(document).on("mouseup touchend", ".umlclass", function(e){
-	$(".umlclass.moving").removeClass("moving");
 	delete holderObject["currentMatrix"];
-	$(this).mouseenter();
+	e.stopPropagation();
+	var $thisId = $(this).attr("id");
+	$(".umlclass.massmove").each(function(){
+		var c = UMLClasses[$(this).attr("id")];
+		c.moving = false;
+		if(!e.ctrlKey && $(this).attr("id") != $thisId)
+		{
+			c.getNode().removeClass("massmove");
+		}
+	});
+});
+
+$(document).on("click", ".umlclass", function(e){
+	e.stopPropagation(); //this is to stop the hiding of the edit_form on mouseup
 });
 
 function moveRelationShip($this){
@@ -117,10 +148,5 @@ function moveRelationShip($this){
 	var startPoint = cStart.findClosestConnection(emp.x, emp.y);
 	var endPoint = cEnd.findClosestConnection(smp.x, smp.y);
 
-	$this.remove();
-
-	var path = '<svg height="5000" width="5000" data-start="class_'+cStart.id+'" data-end="class_'+cEnd.id+'">';
-		path += "<path class='line' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
-	path += '</svg>';
-	$(".umlcanvas").append(path);
+	$this.find("path").attr("d", "M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y);
 }

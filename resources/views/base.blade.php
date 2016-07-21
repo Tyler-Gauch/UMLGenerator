@@ -52,6 +52,12 @@
 			    border-radius:6px 0 6px 6px;
 			}
 
+			#loader{
+				position: absolute; 
+				top:35%; 
+				left: 35%
+			}
+
 		</style>
 
 		@yield("stylesheets")
@@ -93,11 +99,26 @@
 		<div class="container" style="width: 100%; margin-top:65px">
 				@yield('content')
 		</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="loader">
+	  <div class="modal-dialog">
+	    <img src="/gears.gif"/>
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
 	</body>
 
 	<script src="/js/jquery-2.2.3.min.js"></script>
 	<script src="/jquery-ui/jquery-ui.min.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
+	<script>
+		
+		window.showLoader = function(message = "Loading..."){
+			$("#loader").modal("show");
+		}
+
+
+	</script>
 
 	@yield("javascript")
 	

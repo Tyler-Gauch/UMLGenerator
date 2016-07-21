@@ -47,7 +47,7 @@ $(document).ready(function(){
 				$("#"+status).removeClass("btn-warning");
 				$("html, body").css("cursor", "");
 				holderObject = {};
-				$("#edit_form").addClass("hidden");
+				// $("#edit_form").addClass("hidden");
 			}
 			status = $(this).attr("id");
 			$(this).addClass("btn-warning");
@@ -129,10 +129,12 @@ $(document).ready(function(){
 		if(status == "select")
 		{
 			$("#edit_form").addClass("hidden");
-			var c = UMLClasses[$("#edit_target").val()];
-			if(c != null){
-				c.render();
-			}
+			$(".umlclass.massmove").each(function(){
+				UMLClasses[$(this).attr("id")]
+					.unselect()
+					.unhover()
+					.getNode().removeClass("massmove");
+			});
 		}
 	});
 
@@ -145,7 +147,7 @@ $(document).ready(function(){
 		}
 	});
 
-	$(document).on("mouseup", ".umlcanvas", function(e){
+	$(document).on("mouseup", ".umlcanvas, .umlclass, document", function(e){
 		if(status == "scale")
 		{
 			delete holderObject["startMouse"];
@@ -164,6 +166,183 @@ $(document).ready(function(){
 		{
 			addClass();
 			return false;
+		}
+	});
+
+	$(".new_project").on("click", function(e){
+		e.preventDefault();
+
+		getRepoNames(function(data){
+			if(data.success)
+			{
+				var modal = $("#new_project_modal");
+				var repoList = $("#new_project_repo");
+
+				repoList.empty();
+				repoList.append("<option value='null'>Please Select a Repository</option>");
+
+				$.each(data.repos, function(key, value){
+					repoList.append("<option value='"+value+"'>"+value+"</option>");
+				});
+
+				modal.modal("show");
+			}
+		});
+		
+	});
+
+	$("#new_project_create").on("click", function(e){
+		e.preventDefault();
+
+		var type = $("#new_project_type").val();
+		var url = $("#new_project_url").val();
+		var projectName = $("#new_project_name").val();
+		var id = $("#new_project_repo").val();
+		var language = $("#new_project_language").val();
+		var repoName = $("#new_project_repo").val();
+
+		var postData = {type: type};
+
+		if(type == "null")
+		{
+			return;
+		}else if(type == "empty"){
+			postData["name"] = projectName;
+		}else if(type == "github"){
+			if(repoName != "null")
+			{
+				postData["repoName"] = repoName;
+				postData["language"] = language;
+			}else{
+				postData["repoUrl"] = url;
+			}
+		}
+
+		$.ajax({
+			method: "POST",
+			url: "/project/create",
+			data: postData,
+			success: function(data){
+				if(data.success)
+				{
+					if(type == "empty")
+					{
+						window.location = "/"+projectName;
+					}else{
+						window.location = "/"+repoName;
+					}
+				}else{
+					alert("Error:"+data.message);
+				}
+			}
+		});
+	});
+
+	function getRepoNames(callback){
+		$.ajax({
+			method:"POST",
+			url: "/repo/list",
+			success: function(data){
+				callback(data);
+			}
+		});
+	}
+
+	function getBranchNames(callback)
+	{
+		$.ajax({
+			method: "POST",
+			url: "/branch/list",
+			data: {repo: repo},
+			success: function(data){
+				callback(data);
+			}
+		});
+	}
+
+	function getProjects(callback){
+		$.ajax({
+			method: "GET",
+			url: "/project/get",
+			success: function(data){
+				callback(data);
+			}
+		});
+	}
+
+	$("#change_project_branch").on("change", function(e){
+		$.ajax({
+			url: "/parser/"+$("#project_name").text()+"/"+$(this).val(),
+			method: "GET",
+			success: function(data){
+				if(data.success)
+				{
+					$.each(data.data, function(key, value){
+						var umlClass = new UMLClass(value);
+					});
+
+					$.each(UMLClasses, function(id, umlClass){
+						$.each(umlClass.relationships, function(key, className){
+							umlClass.addRelationship(className);
+						});
+					});
+
+				}else{
+					alert("Error: "+data.message);
+				}
+			}
+		});
+	});
+
+	$(".open_project").on("click", function(e){
+		e.preventDefault();
+
+		getProjects(function(data){
+			if(data.success){
+				var modal = $("#open_project_modal");
+				var projects = $("#open_project_name");
+
+				projects.empty();
+				projects.append("<option value='null'>Please select a Project</option>");
+
+				$.each(data.projects, function(key, value){
+					projects.append("<option value='"+value.name+"'>"+value.name+"</option>");
+				});
+
+				modal.modal("show");
+			}
+		});
+	});
+
+	$("#open_project_button").on("click", function(e){
+		e.preventDefault();
+
+		var project = $("#open_project_name").val();
+
+		if(project == null || project == "null")
+		{
+			alert("Please select a project");
+		}else{
+			window.location = "/"+project;
+		}
+	});
+
+	$(document).on("selectstart", "rect text", false);
+
+	$(document).on("mouseover", ".umlclass", function(e){
+		var c = UMLClasses[$(this).attr("id")];
+		if(holderObject["hovering"] == undefined && !c.moving)
+		{
+			holderObject["hovering"] = true;
+			c.hover();
+		}
+	});
+
+	$(document).on("mouseleave", ".umlclass", function(e){
+		delete holderObject["hovering"];
+		var c = UMLClasses[$(this).attr("id")];
+		if(!c.moving && !e.ctrlKey){
+			c.unhover();
 		}
 	});
 });
