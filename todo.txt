@@ -1,0 +1,5 @@
+UML Generator:
+   -Saving parsed stuff into database
+       -each project can have as many diagrams as github branches
+       -for each diagram, save class locations on page, attributes, functions, etc
+   -Open project: opens and closes stuff from database and puts it in right format
