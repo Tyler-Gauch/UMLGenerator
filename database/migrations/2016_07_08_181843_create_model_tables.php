@@ -54,8 +54,10 @@ class CreateModelTables extends Migration
             $table->string('name');
             $table->string('branch');
             $table->integer('model_id')->unsigned();
+            $table->integer('project_id')->unsigned();
 
             $table->foreign('model_id')->references('id')->on('modelTypes');
+            $table->foreign('project_id')->references('id')->on('projects');
         });
 
     }
