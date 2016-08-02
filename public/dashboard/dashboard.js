@@ -266,13 +266,26 @@ $(document).ready(function(){
 		});
 	}
 
-	$("#change_project_branch").on("change", function(e){
+	$(".edit_class_branch").on("click", function(e){
+		e.preventDefault();
+		window.showLoader();
+		var t = $(this);
 		$.ajax({
-			url: "/parser/"+$("#project_name").text()+"/"+$(this).val(),
+			url: "/parser/"+$("#project_name").data("project")+"/"+$(this).data("branch"),
 			method: "GET",
 			success: function(data){
+				window.hideLoader();
 				if(data.success)
 				{
+					$(".edit_class_branch").each(function(){
+						$(this).children().each(function(){
+							$(this).removeClass("fa-check");
+						});
+					});
+
+					t.children().each(function(){
+						$(this).addClass("fa-check");
+					});
 					$.each(data.data, function(key, value){
 						var umlClass = new UMLClass(value);
 					});

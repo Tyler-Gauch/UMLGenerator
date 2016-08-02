@@ -60,23 +60,27 @@
 		<div class="col-lg-2">
 			<div class="row">
 				@if(isset($project))
-					<legend id="project_name">{{$project->name}}</legend>
 					@if(isset($branches))
-						<div class="col-lg-12">
-							<select id="change_project_branch" class="form-control">
-								<option value="null" selected>Please Choose A Branch</option>
-								@foreach($branches as $key=>$branch)
-									<option value="{{ $branch->name }}">{{$branch->name}}</option>
-								@endforeach
-							</select>
+						<div class="dropdown">
+						  	<button class="btn btn-block dropdown-toggle" type="button" id="project_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="font-size: 24px; text-align:left; background-color:#ccc" data-project="{{$project->name}}">
+						    {{$project->name}}
+						    	<span class="fa fa-chevron-circle-down"></span>
+						  	</button>
+						  	<ul class="dropdown-menu" id="edit_class_branch_list" aria-labelledby="project_name">
+						    @foreach($branches as $key=>$branch)
+						    	<li><a data-branch="{{ $branch->name }}" class="edit_class_branch">{{ $branch->name }} <span class="fa" style="color: #5CB85C"></span></a></li>
+							@endforeach
+							</ul>
 						</div>
+					@else
+						<legend id="project_name" style="font-size: 24px; text-align: left; background-color: #ccc" data-project="{{$project->name}}">{{$project->name}}</legend>
 					@endif
 				@endif
 				<div class="col-lg-12">
 				</div>
 			</div>
 
-			<div class="row hidden" id="edit_form">
+			<div class="row hidden" id="edit_form" style="max-height: 80%; overflow-y:scroll">
 				<div class="col-lg-12">
 					<div class="form-group">
 						<div class="row">
@@ -90,9 +94,24 @@
 				<div class="col-lg-12">
 					<div class="form-group">
 						<div class="row">
+							<label>Class Type: </label>
+						</div>
+						<div class="row">
+							<select class="form-control" id="edit_class_type">
+								<option value="class">Class</option>
+								<option value="abstract">Abstract</option>
+								<option value="interface">Interface</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
 							<label>Attributes:</label>
 						</div>
-						<div class="row" id="edit_attributes" style="height: 25%; overflow:scroll">
+						<div class="row" id="edit_attributes" style="max-height: 25%; overflow-y:scroll">
+
 						</div>
 						<div class="row">
 							<div class="input-group">
@@ -109,7 +128,7 @@
 						<div class="row">
 							<label>Functions:</label>
 						</div>
-						<div class="row" id="edit_functions" style="height: 25%; overflow:scroll">
+						<div class="row" id="edit_functions" style="max-height: 25%; overflow-y:scroll">
 						</div>
 						<div class="row">
 							<div class="input-group">
@@ -275,11 +294,16 @@
 	<script src="/dashboard/dashboard.js"></script>
 
 	<script>
-		
+
 		$(document).ready(function(){
 			$("#save_project").on("click", function(){
-				UMLClassSaveAll();
+				window.showLoader("Please Wait.  Saving in Progess...");
+				UMLClassSaveAll(window.hideLoader());
 			});
+
+			@if(isset($branches))
+				$("#edit_class_branch_list").find("a").click();
+			@endif
 		});
 
 		$("#new_project_type").on("change", function(){
