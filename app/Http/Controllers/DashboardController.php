@@ -8,6 +8,9 @@ use Illuminate\Http\Response;
 use App\Helpers\GitHubHelper;
 use Auth;
 use App\Models\Project;
+use DB;
+use Log;
+
 
 class DashboardController extends Controller
 {
@@ -16,13 +19,28 @@ class DashboardController extends Controller
    		$data = [];
    		if($project != null)
    		{
-   			$data["project"] = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
+            $data["project"] = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
 
-            if($data["project"]->ProjectType->name == "github")
-            {
-   			   $github = new GitHubHelper(Auth::user());
-   			   $data["branches"] = $github->listBranches($project);
-            }
+            // Get the project type
+            $type = DB::table('project_types')
+                  ->join('projects', 'project_types.id', '=', 'projects.project_type_id')
+                  ->select('project_types.name as type_name', 'projects.user_id', 'projects.name as proj_name')
+                  ->where('projects.user_id', '=', Auth::user()->id)
+                  ->where('projects.name', '=', $project)
+                  ->get();
+
+            // echo '<pre>';
+            // foreach ($type as $t) {
+            //    var_dump($t);
+            // }
+            // echo'</pre>';
+
+            // Get the github branches only if the project is of type github
+            if ($type[0]->type_name != "empty") {
+               $github = new GitHubHelper(Auth::user());
+
+               $data["branches"] = $github->listBranches($project);
+           }
    		}
    		return response()->view("dashboard", $data);
    	}
@@ -33,17 +51,18 @@ class DashboardController extends Controller
 
    		$repos = $github->listRepos();
 
-		$info = [];
+   		$info = [];
 
-		foreach($repos as $key=>$repo){
-			$info[] = $repo->name;
-		}
+   		foreach($repos as $key=>$repo){
+   			$info[] = $repo->name;
+   		}
 
-		return response()->json(["success" => true, "repos" => $info]);
+         return response()->json(["success" => true, "repos" => $info]);
    	}
 
    	public function listBranches(Request $request)
    	{
+
    		$github = new GitHubHelper(Auth::user());
 
    		$repo = $request->input("repo", null);

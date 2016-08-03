@@ -204,14 +204,15 @@ $(document).ready(function(){
 		{
 			return;
 		}else if(type == "empty"){
-			postData["projectName"] = projectName;
+			postData["name"] 		= projectName;
+			postData["language"] 	= "None";
 		}else if(type == "github"){
 			if(repoName != "null")
 			{
 				postData["repoName"] = repoName;
 				postData["language"] = language;
 			}else{
-				postData["repoUrl"] = url;
+				postData["repoUrl"]  = url;
 			}
 		}
 
