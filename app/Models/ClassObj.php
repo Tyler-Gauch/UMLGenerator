@@ -16,8 +16,6 @@ class ClassObj extends Model
      */
     protected $table = 'classes';
 
-    public $timestamps = false;
-
 
     /**
      * The attributes that are mass assignable.
@@ -28,10 +26,10 @@ class ClassObj extends Model
         'locationX', 'locationY', 'name', 'type', 'package', 'model_id'
     ];
 
-    public function Attributes(){
-        return $this->hasMany("App\\Models\\Attribute");
+    public function Attribute(){
+        return $this->hasMany("App\\Models\\Attribute", "class_id");
     }
-    public function Operations() {
-        return $this->hasMany("App\\Models\\Operation");
+    public function Operation() {
+        return $this->hasMany("App\\Models\\Operation", "class_id");
     }
 }

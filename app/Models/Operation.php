@@ -15,10 +15,10 @@ class Operation extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'class_id', 'visibility', 'return_type', 'parameters'
+        'name', 'class_id', 'visibility', 'return_type', 'parameters', 'is_static', 'is_final', 'is_abstract'
     ];
 
-    public $timestamps = false;
+    // public $timestamps = false;
 
     public function ClassObj() {
          return $this->belongsTo("App\\Models\\ClassObj");

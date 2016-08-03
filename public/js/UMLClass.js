@@ -14,6 +14,8 @@ var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 		postData[k++] = value.serialize(); 
 	});
 
+	console.log(JSON.stringify(postData));
+
 	$.ajax({
 		url: UMLClassSaveURL,
 		method: "POST",

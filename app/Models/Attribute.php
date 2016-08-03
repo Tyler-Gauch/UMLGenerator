@@ -14,10 +14,10 @@ class Attribute extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'class_id', 'visibility', 'type', 'default_value'
+        'name', 'class_id', 'visibility', 'type', 'default_value', 'is_static', 'is_final', 'is_abstrct'
     ];
 
-    public $timestamps = false;
+    // public $timestamps = false;
     
     public function ClassObj() {
          return $this->belongsTo("App\\Models\\ClassObj");

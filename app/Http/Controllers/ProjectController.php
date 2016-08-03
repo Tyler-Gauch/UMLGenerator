@@ -10,10 +10,11 @@ use Auth;
 use App\Models\Project;
 use App\Models\ProjectType;
 use App\Models\Language;
+use App\Models\ModelObj;
 use App\Models\ClassObj;
 use App\Models\Attribute;
 use App\Models\Operation;
-use DB;
+use Carbon\Carbon;
 use Log;
 
 class ProjectController extends Controller
@@ -58,107 +59,123 @@ class ProjectController extends Controller
       }
 
       public function save(Request $request, $project) {
+
+         // Get the current timestamp which will be used for removing old attributes, functions, and classes later on
+         $currentTime = Carbon::now()->toDateTimeString();
+         
          // Get the project id of the current project and add the model
          $proj = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
          $branch = $request->input("branch", null);
 
-         // Get the github branch or NULL if empty project
-         $model = DB::table('models')->where("project_id", "=", $proj["id"])->where("branch", "=", $branch)->get();
-
-         // If there wasnt a model already defined, insert it
-         if ($model == null) {
-            $modelID = DB::table('models')->insert(
-               ["branch" => $branch, "project_id" => $proj["id"]]
-            );
-            $model = DB::table('models')->where("id", "=", $modelID)->get()[0];
-         } else {
-            $model = $model[0]; // Dont want an array, so grab the first entry
-         } 
+         // Get the model of the github branch or NULL if empty project
+         $model = ModelObj::where("project_id", "=", $proj["id"])->where("branch", "=", $branch)->firstOrCreate(
+            [
+            "branch" => $branch, 
+            "project_id" => $proj["id"]
+            ]
+         );
 
          // Loop through classes from user input
          $data = $request->all();
          foreach ($data as $curObj) {
-            if ($curObj["type"] == "class") {
-               $className = $curObj["className"];
-               $locX = $curObj["x"];  // starting x coordinate of the class 
-               $locY = $curObj["y"];  // starting y coordinate of the class
+            $className  = $curObj["className"];
+            $locX       = $curObj["x"];  // starting x coordinate of the class 
+            $locY       = $curObj["y"];  // starting y coordinate of the class
+            $classType  = $curObj["type"];
 
-               if (isset($curObj["classType"])) {
-                  $classType = $curObj["classType"];
-               } else {
-                  $classType = "public";
+            // Create the class in the database
+            $curClass = ClassObj::where("name", "=", $className)->where("model_id", "=", $model->id)->firstOrNew(
+               [
+               "name"      => $className,
+               "model_id"  => $model->id
+               ]
+            );
+
+            // Update the values
+            $curClass->locationX = $locX;
+            $curClass->locationY = $locY;
+            $curClass->type      = $classType;
+            $curClass->updated_at= $currentTime; 
+
+            // TODO Do we need the package name if its java?
+
+            $curClass->save();
+
+
+            // Get attribute and function names
+            if (isset($curObj["attributes"])) {
+               foreach ($curObj["attributes"] as $attr) {
+
+                  // Get values from current attribute object
+                  $attribute = Attribute::where("name", "=", $attr["name"])->where("class_id", "=", $curClass->id)->firstOrNew(
+                     [
+                     "name"      => $attr["name"],
+                     "class_id"  => $curClass->id
+                     ]
+                  );
+
+                  // Update the values
+                  $attribute->visibility  = $attr["visibility"];
+                  $attribute->type        = $attr["type"];
+                  $attribute->is_static   = $attr["isStatic"];
+                  $attribute->is_final    = $attr["isFinal"];
+                  $attribute->is_abstract = $attr["isAbstract"];
+                  $attribute->updated_at  = $currentTime; 
+
+                  // TODO default value doesnt show up right, has a colon
+
+                  $attribute->save();
+
                }
 
-               $debug = "Class " . $className . " (" . $locX . ", " . $locY . "), attributes {";
-
-               // Create the class in the database
-               $curClass = ClassObj::where("name", "=", $className)->where("model_id", "=", $model->id)->firstOrNew([
-                  "name" => $className,
-                  "model_id" => $model->id
-                  // "locationX" => $locX,
-                  // "locationY" => $locY,
-                  // "type" => $classType
-               ]);
-
-               // Update the values
-               $curClass->locationX = $locX;
-               $curClass->locationY = $locY;
-               $curClass->type = $classType;
-
-               // TODO add package
-
-               $curClass->save();
-
-
-               // Get attribute and function names
-               if (isset($curObj["attributes"])) {
-                  foreach ($curObj["attributes"] as $attr) {
-                     $debug .= $attr . ", ";
-
-                     // TODO - Get values from array
-                     $attribute = Attribute::where("name", "=", $attr)->where("class_id", "=", $curClass->id)->firstOrNew([
-                        "name" => $attr,
-                        "class_id" => $curClass->id
-                     ]);
-                     $attribute->visibility = "public";
-                     $attribute->type="int";
-
-                     // TODO default value
-
-                     $attribute->save();
-
-                  }
-               }
-
-               $debug .= "}, functions {";
-
-               if (isset($curObj["functions"])) {
-                  foreach ($curObj["functions"] as $func) {
-                     $debug .= $func . ", ";
-
-                     // TODO - Get values from array
-                     $operation = Operation::where("name", "=", $func)->where("class_id", "=", $curClass->id)->firstOrNew([
-                        "name" => $func,
-                        "class_id" => $curClass->id
-                     ]);
-                     $operation->visibility = "public";
-                     $operation->return_type = "void";
-
-                     // TODO parameters
-
-                     $operation->save();
-
-                  }
-               }
-
-               $debug .= "}";
-
-               Log::debug($debug);
-
-
+               // Now all attributes saved from the user have been updated. Remove any old attributes of the current class
+               Attribute::where("class_id", "=", $curClass->id)->where("updated_at", "<", $currentTime)->delete();
             }
+
+
+            if (isset($curObj["functions"])) {
+               foreach ($curObj["functions"] as $func) {
+
+                  // Get values from current function object
+                  $operation = Operation::where("name", "=", $func["name"])->where("class_id", "=", $curClass->id)->firstOrNew(
+                     [
+                     "name"      => $func["name"],
+                     "class_id"  => $curClass->id
+                     ]
+                  );
+
+                  // Update the values
+                  $operation->visibility  = $func["visibility"];
+                  $operation->return_type = $func["type"];
+                  $operation->is_static   = $func["isStatic"];
+                  $operation->is_final    = $func["isFinal"];
+                  $operation->is_abstract = $func["isAbstract"];
+                  $operation->parameters  = $func["parameters"];
+                  $operation->updated_at  = $currentTime; 
+
+                  $operation->save();
+
+               }
+
+               // Now all functions saved from the user have been updated. Remove any old functions of the current class
+               Operation::where("class_id", "=", $curClass->id)->where("updated_at", "<", $currentTime)->delete();
+            }
+
+
+
          }
 
+         // Now all classes saved from the user have been updated. Remove any old classes of the current model
+         $oldClasses = ClassObj::where("model_id", "=", $model->id)->where("updated_at", "<", $currentTime)->get();
+         
+         foreach ($oldClasses as $oldClass) {
 
+            // Ensure the children are removed
+            $oldClass->Attribute()->delete();
+            $oldClass->Operation()->delete();
+            $oldClass->delete();
+         }
       }
+
+   
 }

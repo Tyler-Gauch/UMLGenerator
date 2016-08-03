@@ -31,6 +31,8 @@ class CreateModelTables extends Migration
             $table->string('type');
             $table->string('package')->nullable();
 
+            $table->timestamps();
+
             $table->foreign('model_id')->references('id')->on('models');
         });
 
@@ -41,6 +43,11 @@ class CreateModelTables extends Migration
             $table->string('visibility');
             $table->string('return_type');
             $table->string('parameters')->nullable();
+            $table->boolean('is_static')->default(false);
+            $table->boolean('is_final')->default(false);
+            $table->boolean('is_abstract')->default(false);
+
+            $table->timestamps();
 
             $table->foreign('class_id')->references('id')->on('classes');
         });
@@ -52,6 +59,11 @@ class CreateModelTables extends Migration
             $table->string('visibility');
             $table->string('type');
             $table->string('default_value')->nullable();
+            $table->boolean('is_static')->default(false);
+            $table->boolean('is_final')->default(false);
+            $table->boolean('is_abstract')->default(false);
+
+            $table->timestamps();
 
             $table->foreign('class_id')->references('id')->on('classes');
         });
