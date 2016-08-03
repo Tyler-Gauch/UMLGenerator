@@ -38,6 +38,9 @@ function clearEditForm(){
 	$("#edit_functions_add").val("");
 	$("#edit_target").val("null");
 	$("#edit_form").addClass("hidden");
+	$("#list_view").removeClass("hidden");
+	$("#edit_line_form").addClass("hidden");
+
 }
 
 function deleteClass(){
@@ -52,9 +55,16 @@ function deleteClass(){
 		});
 		delete UMLClasses[$("#edit_target").val()];
 		$("#class_"+c.id+"_parent").remove();
+		removeClassFromListView(c.id);
 		clearEditForm();
 	}
 }
+
+$(".edit_back").on("click", function(){
+	clearEditForm();
+	$("#edit_line_form").addClass("hidden");
+
+});
 
 //////////////////////////////////////////////////////
 //													//
@@ -200,7 +210,7 @@ function appendEditAttribute(key, umlClass){
 					'<div class="input-group">'+
 						'<input type="text" class="edit_attributes form-control" data-key="'+key+'" value="'+umlClass.attributes[key].name+'"/>'+
 						'<span class="input-group-btn">'+
-							'<button class="btn btn-primary edit_expand" data-target="edit_attributes_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
+							'<button class="btn btn-success edit_expand" data-target="edit_attributes_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
 						'</span>'+
 					'</div>'+
 					'<div class="col-lg-12" id="edit_attributes_expand_content_'+id+'" style="background-color: #ccc; display:none">'+
@@ -404,7 +414,7 @@ function appendEditFunction(key, umlClass){
 					'<div class="input-group">'+
 						'<input type="text" class="edit_functions form-control" data-key="'+key+'" value="'+umlClass.functions[key].name+'"/>'+
 						'<span class="input-group-btn">'+
-							'<button class="btn btn-primary edit_expand" data-target="edit_functions_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
+							'<button class="btn btn-success edit_expand" data-target="edit_functions_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
 						'</span>'+
 					'</div>'+
 					'<div class="col-lg-12" id="edit_functions_expand_content_'+id+'" style="background-color: #ccc; display:none">'+

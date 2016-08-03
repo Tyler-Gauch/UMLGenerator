@@ -72,6 +72,7 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 			});
 			$("#edit_classname").val(c.className);
 			$("#edit_target").val($(this).attr("id"));
+			$("#edit_class_type").val(c.classType);
 
 			var attrs = $("#edit_attributes");
 			attrs.empty();
@@ -82,8 +83,12 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 			$.each(c.functions, function(key, value){appendEditFunction(key, c)});
 
 			$("#edit_form").removeClass("hidden");
+			$("#edit_line_form").addClass("hidden");
+			$("#list_view").addClass("hidden");
 		}else{
 			$("#edit_form").addClass("hidden");
+			$("#list_view").removeClass("hidden");
+			$("#edit_line_form").addClass("hidden");			
 		}
 	}
 });
@@ -131,6 +136,9 @@ $(document).on("mouseup touchend", ".umlclass", function(e){
 		if(!e.ctrlKey && $(this).attr("id") != $thisId)
 		{
 			c.getNode().removeClass("massmove");
+		}else if($(this).attr("id") == $thisId)
+		{
+			c.render();
 		}
 	});
 });
@@ -138,6 +146,7 @@ $(document).on("mouseup touchend", ".umlclass", function(e){
 $(document).on("click", ".umlclass", function(e){
 	e.stopPropagation(); //this is to stop the hiding of the edit_form on mouseup
 });
+
 
 function moveRelationShip($this){
 	var cStart = UMLClasses[$this.data("start")];

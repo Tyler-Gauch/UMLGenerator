@@ -19,7 +19,13 @@ class JavaParserHelper extends ParserHelper {
 			"classType" => "class",
 			"functions" => [],
 			"attributes" => [],
-			"relationships" => [],
+			"relationships" => [
+				"implements" => [],
+				"inherits" => [],
+				"references" => [],
+				"aggregation" => [],
+				"composite-aggregation" => []
+			],
 			"package" => null,
 			"nestedClasses" => []
 		];
@@ -68,11 +74,13 @@ class JavaParserHelper extends ParserHelper {
 						}
 						$end = $this->iterator;
 						$parser = new JavaParserHelper(substr($this->fileContents, $start, $end-$start));
-						$results["nestedClasses"][] = $parser->parse();
+						$nested = $parser->parse();
+						$nested["relationships"]["aggregation"][] = $results["className"];
+						$results["nestedClasses"][] = $nested;
 					}
 					break;
 				case "extends":
-					$results["relationships"][] = $this->sanitize($this->getNextWord());
+					$results["relationships"]["inherits"][] = $this->sanitize($this->getNextWord());
 					break;
 				case "private":
 				case "public":
@@ -181,7 +189,7 @@ class JavaParserHelper extends ParserHelper {
 							$func["type"] = $type;
 							if(!in_array($type, $results["relationships"]))
 							{
-								$results["relationships"][] = $type;
+								$results["relationships"]["references"][] = $type;
 							}
 						}
 						$results["functions"][] = $func;
@@ -190,7 +198,7 @@ class JavaParserHelper extends ParserHelper {
 						{
 							if(!in_array($nextWord, $results["relationships"]))
 							{
-								$results["relationships"][] = $nextWord;
+								$results["relationships"]["references"][] = $nextWord;
 							}
 							$results["attributes"][] = [
 								"name" => $attribute["name"],
@@ -211,7 +219,7 @@ class JavaParserHelper extends ParserHelper {
 					$r = $this->findNextNonKeyword();
 					$r = str_replace(";", "", substr(strrchr($r, "."), 1));
 					if(!in_array($r, $results["relationships"]))
-					$results["relationships"][] = $r;
+					$results["relationships"]["references"][] = $r;
 					break;
 				case "implements":
 					$temp = $this->findNextNonKeyword();
@@ -228,7 +236,7 @@ class JavaParserHelper extends ParserHelper {
 					{
 						if(!in_array($interface, $results["relationships"]))
 						{
-							$results["relationships"][] = $interface;
+							$results["relationships"]["implements"][] = $interface;
 						}
 					}
 					break;

@@ -36,11 +36,6 @@ var UMLClass = function(config){
 		config.functions = [];
 	}
 
-	if(!$.isArray(config.relationships))
-	{
-		config.relationships = [];
-	}
-
 	if(config.x == undefined)
 	{
 		config.x = UMLClassX;
@@ -276,7 +271,7 @@ UMLClass.prototype = {
 			return "#";
 		}
 	},
-	addRelationship: function(className){
+	addRelationship: function(className, type){
 		var umlClass = null;
 		$.each(UMLClasses, function(key, value){
 			if(value.className == className)
@@ -294,20 +289,42 @@ UMLClass.prototype = {
 
 		var emp = this.midPoint();
 		var smp = umlClass.midPoint();
-		var startPoint = this.findClosestConnection(emp.x, emp.y);
-		var endPoint = umlClass.findClosestConnection(smp.x, smp.y);
+		var startPoint = this.findClosestConnection(smp.x, smp.y);
+		var endPoint = umlClass.findClosestConnection(emp.x, emp.y);
 
 		var exists = false;
 
+		var $path = null
+
 		$(document).find("[data-end='class_"+this.id+"'][data-start='class_"+umlClass.id+"']").each(function(){
 			exists = true;
+			$path = $(this);
 		});
 		$(document).find("[data-start='class_"+this.id+"'][data-end='class_"+umlClass.id+"']").each(function(){
 			exists = true;
+			$path = $(this);
 		});
 
 		if(exists)
 		{
+			var startMarker = $($path.children()[0]).attr("marker-start");
+			var endMarker = $($path.children()[0]).attr("marker-end");
+			var dotted = $($path.children()[0]).attr("stroke-dasharray");
+			//check if we have the propper marker for this class
+			if(type == "implements" && (startMarker != "url(#arrowEmpty)" || dotted != "5,5"))
+			{
+				$path.attr("marker-start","url(#arrowEmpty)");
+				$path.attr("stoke-dasharray", "5,5");
+			}else if(type == "inherits" && startMarker != "url(#arrowEmpty)")
+			{
+				$path.attr("marker-start", "url(#arrowEmpty)");
+			}else if(type == "aggregation" && startMarker != "url(#diamondEmpty)")
+			{
+				$path.attr("marker-start", "url(#diamondEmpty)");
+			}else if(type == "composite-aggregation" && startMarker != "url(#diamondFill)")
+			{
+				$path.attr("marker-start", "url(#diamondFill)");
+			}
 			return;
 		}
 
@@ -318,10 +335,27 @@ UMLClass.prototype = {
 		}
 
 		var path = '<svg height="5000" width="5000" data-start="class_'+this.id+'" data-end="class_'+umlClass.id+'">';
-			path += "<path class='"+classes+"' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'></path>";
-		path += '</svg>';
-		$(".umlcanvas").append(path);
+			path += "<path id='relationship_class_"+this.id+"_class_"+umlClass.id+"' class='"+classes+"' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'";
 
+			if(type == "implements")
+			{
+				path += " marker-end='url(#arrowEmpty)' stroke-dasharray='5,5'";
+			}else if(type == "inherits")
+			{
+				path += " marker-end='url(#arrowEmpty)'";
+			}else if(type == "aggregation")
+			{
+				path += " marker-end='url(#diamondEmpty)'";
+			}else if(type == "composite-aggregation")
+			{
+				path += " marker-end='url(#diamondFill)'";
+			}
+
+			path += "></path>";
+		path += '</svg>';
+
+		$(".umlcanvas").append(path);
+		$("#relationship_class_"+this.id+"_class_"+umlClass.id).click();
 	},
 	select: function(){
 		this.selected = true;

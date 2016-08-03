@@ -172,8 +172,7 @@ abstract class ParserHelper {
 				$contents = file_get_contents($class2["fileName"]);
 				if(strpos($contents, $class["className"]))
 				{
-					Log::info("YES IT DOES");
-					$results[$key2]["relationships"][] = $class["className"];
+					$results[$key2]["relationships"]["references"][] = $class["className"];
 				}
 			}
 		}

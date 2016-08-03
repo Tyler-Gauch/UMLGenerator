@@ -18,9 +18,11 @@ class DashboardController extends Controller
    		{
    			$data["project"] = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
 
-   			$github = new GitHubHelper(Auth::user());
-
-   			$data["branches"] = $github->listBranches($project);
+            if($data["project"]->ProjectType->name == "github")
+            {
+   			   $github = new GitHubHelper(Auth::user());
+   			   $data["branches"] = $github->listBranches($project);
+            }
    		}
    		return response()->view("dashboard", $data);
    	}

@@ -24,8 +24,8 @@
       		</a>
       	</li>
       	<li>
-      		<a href="#" id="save_project_as" class="clear-fix">
-      			Save As <span class="hot_key pull-right">CTRL+SHIFT+S</span>
+      		<a href="#" id="open_project_settings" class="clear-fix">
+      			Project Settings<span class="hot_key pull-right"></span>
       		</a>
       	</li>
       </ul>
@@ -80,7 +80,72 @@
 				</div>
 			</div>
 
+			<div class="row" id="list_view" style="max-height: 80%; overflow-y:scroll">
+				
+			</div>
+
+			<div class="row hidden" id="edit_line_form" style="max-height: 80%; overflow-y:scroll">
+				<div class="col-lg-6">
+					<button class="btn btn-success edit_back"><span class="fa fa-arrow-left"></span></button>
+				</div>
+				<div class="col-lg-6">
+					<button id="edit_line_delete" class="btn btn-danger pull-right"><span class="fa fa-trash"></span></button>
+				</div>
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
+							<label>Start Marker:</label>
+						</div>
+						<div class="row">
+							<select id="edit_line_start" class="form-control">
+								<option value="none">None</option>
+								<option value="arrowEmpty">Arrow</option>
+								<option value="arrowFill">Arrow Filled</option>
+								<option value="diamondEmpty">Diamond</option>
+								<option value="diamondFill">Diamond Filled</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
+							<label>Line Type:</label>
+						</div>
+						<div class="row">
+							<select id="edit_line_type" class="form-control">
+								<option value="solid">Solid</option>
+								<option value="dotted">Dotted</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12">
+					<div class="form-group">
+						<div class="row">
+							<label>End Marker:</label>
+						</div>
+						<div class="row">
+							<select id="edit_line_end" class="form-control">
+								<option value="none">None</option>
+								<option value="arrowEmpty">Arrow</option>
+								<option value="arrowFill">Arrow Filled</option>
+								<option value="diamondEmpty">Diamond</option>
+								<option value="diamondFill">Diamond Filled</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<input type="hidden" id="edit_line_target"/>
+			</div>
+
 			<div class="row hidden" id="edit_form" style="max-height: 80%; overflow-y:scroll">
+				<div class="col-lg-6">
+					<button class="btn btn-success edit_back"><span class="fa fa-arrow-left"></span></button>
+				</div>
+				<div class="col-lg-6">
+					<button id="edit_delete" class="btn btn-danger pull-right"><span class="fa fa-trash"></span></button>
+				</div>
 				<div class="col-lg-12">
 					<div class="form-group">
 						<div class="row">
@@ -113,12 +178,14 @@
 						<div class="row" id="edit_attributes" style="max-height: 25%; overflow-y:scroll">
 
 						</div>
-						<div class="row">
-							<div class="input-group">
-								<input type="text" id="edit_attributes_add" class="form-control"/>
-								<span class="input-group-btn">
-									<button class="btn btn-primary" id="edit_attributes_add_btn">+</button>
-								</span>
+						<div class="row" style="padding-top: 10px">
+							<div class="col-lg-12">
+								<div class="input-group">
+									<input type="text" id="edit_attributes_add" class="form-control"/>
+									<span class="input-group-btn">
+										<button class="btn btn-primary" id="edit_attributes_add_btn">+</button>
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -130,25 +197,38 @@
 						</div>
 						<div class="row" id="edit_functions" style="max-height: 25%; overflow-y:scroll">
 						</div>
-						<div class="row">
-							<div class="input-group">
-								<input type="text" id="edit_functions_add" class="form-control"/>
-								<span class="input-group-btn">
-									<button class="btn btn-primary" id="edit_functions_add_btn">+</button>
-								</span>
+						<div class="row" style="padding-top: 10px">
+							<div class="col-lg-12">
+								<div class="input-group">
+									<input type="text" id="edit_functions_add" class="form-control"/>
+									<span class="input-group-btn">
+										<button class="btn btn-primary" id="edit_functions_add_btn">+</button>
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>	
-				<div class="col-lg-12">
-					<button id="edit_delete" class="btn btn-danger">Delete Class</button>
-				</div>
 				<input type="hidden" value="null" id="edit_target"/>
 			</div>
 		</div>
 		<div class="col-lg-10">
 			<div class="row parent-container" id="parent">
 				<svg class="umlcanvas" preserveAspectRatio="xMinYMin meet" viewBox="0 0 5000 5000">
+					<defs>
+					    <marker id="diamondFill" markerWidth="10" markerHeight="10" refx="8" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
+					    	<path d="M-1,3 L4,6 L8,3 L4,0 z" class="marker"/>
+					    </marker>
+					    <marker id="diamondEmpty" markerWidth="12" markerHeight="12" refx="8" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
+					    	<path d="M0,3 L4,6 L8,3 L4,0 L0,3" class="marker empty"/>
+					    </marker>
+					    <marker id="arrowEmpty" markerWidth="12" markerHeight="12" refx="9" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
+					    	<path d="M0,0 L0,6 L9,3 z" class="marker empty"/>
+					    </marker>
+					    <marker id="arrowFill" markerWidth="12" markerHeight="12" refx="9" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
+					    	<path d="M0,0 L0,6 L9,3 z" class="marker"/>
+					    </marker>
+					  </defs>
 				</svg>
 			</div>
 		</div>
@@ -262,6 +342,35 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
+	<div class="modal fade" tabindex="-1" role="dialog" id="project_settings">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Project Settings</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+		        <div class="col-lg-12">
+		        	<div class="form-group">
+		        		<div class="col-lg-4">
+		        			<label>Project Name</label>
+		        		</div>
+		        		<div class="col-lg-8">
+		        			<input type="text" class="form-control" id="project_settings_name"/>
+		        		</div>
+		        	</div>
+		        </div>
+	        </div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary" id="project_settings_save">Open Project</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
 @endsection
 
 @section("javascript")
@@ -273,6 +382,7 @@
 		var holderObject = {};
 		var viewBoxDefault = 5000;
 		UMLClassSaveURL = "/";
+		var defaultMarker = "arrowFill";
 
 		//blade variables
 
@@ -285,6 +395,20 @@
 		window.midpoint = function(x1, y1, x2, y2)
 		{
 			return {x: (x1+x2)/2, y: (y1+y2)/2}
+		}
+
+		function addClassToListView(umlClass){
+			var lv = $("#list_view");
+			var html = '<div class="col-lg-12 list_view_element" data-target="class_'+umlClass.id+'" id="list_view_class_'+umlClass.id+'">'+
+							'<strong>'+umlClass.className+'</strong>'+
+			'			</div>';
+
+			lv.append(html);
+		}
+
+		function removeClassFromListView(umlClassId)
+		{
+			$("#list_view_class_"+umlClassId).remove();
 		}
 	</script>
 
@@ -301,28 +425,109 @@
 				UMLClassSaveAll(window.hideLoader());
 			});
 
+			$(document).on("click", ".list_view_element", function(){
+				$("#"+$(this).data("target")).trigger({type: "mousedown", which:1});
+				$("#"+$(this).data("target")).mouseup();
+			});
+
+
 			@if(isset($branches))
 				$("#edit_class_branch_list").find("a").click();
 			@endif
-		});
 
-		$("#new_project_type").on("change", function(){
-			var type = $(this).val();
+			$("#new_project_type").on("change", function(){
+				var type = $(this).val();
 
-			if(type == "null")
-			{
-				$("#new_git_project").addClass("hidden");
-				$("#new_empty_project").addClass("hidden");
-				$("#new_project_create").addClass("hidden");
-			}else if(type == "empty"){
-				$("#new_empty_project").removeClass("hidden");
-				$("#new_git_project").addClass("hidden");
-				$("#new_project_create").removeClass("hidden");
-			}else if(type == "github"){
-				$("#new_git_project").removeClass("hidden");
-				$("#new_empty_project").addClass("hidden");
-				$("#new_project_create").removeClass("hidden");
-			}
+				if(type == "null")
+				{
+					$("#new_git_project").addClass("hidden");
+					$("#new_empty_project").addClass("hidden");
+					$("#new_project_create").addClass("hidden");
+				}else if(type == "empty"){
+					$("#new_empty_project").removeClass("hidden");
+					$("#new_git_project").addClass("hidden");
+					$("#new_project_create").removeClass("hidden");
+				}else if(type == "github"){
+					$("#new_git_project").removeClass("hidden");
+					$("#new_empty_project").addClass("hidden");
+					$("#new_project_create").removeClass("hidden");
+				}
+			});
+
+			$("#open_project_settings").on("click", function(){
+				$("#project_settings_name").val($("#project_name").data("project"));
+				$("#project_settings").modal("show");
+			});
+
+			$(document).on("click", ".line", function(e){
+				e.preventDefault();
+				e.stopPropagation();
+
+				$("#list_view").addClass("hidden");
+				$("#edit_form").addClass("hidden");
+				$("#edit_line_form").removeClass("hidden");
+
+				var path = $($(this).closest("path"));
+
+				var startMarker = path.attr("marker-start");
+				var endMarker = path.attr("marker-end");
+				var dashArray = path.attr("stroke-dasharray");
+
+				console.log(startMarker, endMarker, dashArray);
+
+				if(startMarker == undefined)
+				{
+					$("#edit_line_start").val("none");
+				}else {
+					$("#edit_line_start").val(startMarker.replace("url(#", "").replace(")", ""));
+				}
+
+				if(endMarker == undefined)
+				{
+					$("#edit_line_end").val("none");
+				}else {
+					$("#edit_line_end").val(endMarker.replace("url(#", "").replace(")", ""));
+				}
+
+				if(dashArray == undefined)
+				{
+					$("#edit_line_type").val("solid");
+				}else{
+					$("#edit_line_type").val("dotted");
+				}
+
+				$("#edit_line_target").val(path.attr("id"));
+
+				console.log(path);
+			});
+
+			$("#edit_line_start").on("change", function(){
+				if($(this).val() == "none")
+				{
+					$("#"+$("#edit_line_target").val()).attr("marker-start", "");
+				}else{
+					$("#"+$("#edit_line_target").val()).attr("marker-start", "url(#"+$(this).val()+")");
+				}
+			});
+
+			$("#edit_line_type").on("change", function(){
+				if($(this).val() == "solid")
+				{
+					$("#"+$("#edit_line_target").val()).attr("stroke-dasharray", "");
+				}else{
+					$("#"+$("#edit_line_target").val()).attr("stroke-dasharray", "5,5");
+				}
+			});
+
+			$("#edit_line_end").on("change", function(){
+				if($(this).val() == "none")
+				{
+					$("#"+$("#edit_line_target").val()).attr("marker-end", "");
+				}else{
+					$("#"+$("#edit_line_target").val()).attr("marker-end", "url(#"+$(this).val()+")");
+				}
+			});
+
 		});
 
 	</script>

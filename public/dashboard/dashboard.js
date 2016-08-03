@@ -25,13 +25,18 @@ $(document).ready(function(){
 			addClass();
 		});
 		function addClass(){
+			console.log("Adding new class");
 			var umlclass = new UMLClass({});
+			addClassToListView(umlclass);
 			$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
 			$("#class_"+umlclass.id).mouseup();
 			$("#edit_classname").focus();
 			$("#edit_classname").select();
 			$("#select").click();
 			$("#edit_form").removeClass("hidden");
+			$("#list_view").addClass("hidden");
+			$("#edit_line_form").addClass("hidden");
+
 		}
 
 		$(".btn-toolbar").on("click", function(){
@@ -75,16 +80,9 @@ $(document).ready(function(){
 
 					holderObject["pathStart"] = mouseClick;
 				}else{
-					var mouseClick = c.findClosestConnection(holderObject["pathStart"].x, holderObject["pathStart"].y);
-					mouseClick["c"] = c;
-
-					holderObject["pathEnd"] = mouseClick;
 					$("#line-temp").remove();
-					var path = '<svg height="5000" width="5000" data-start="class_'+holderObject["pathStart"].c.id+'" data-end="class_'+holderObject["pathEnd"].c.id+'">';
-						path += "<path class='line' stroke-width='2px' stroke='black' d='M"+holderObject["pathStart"].x+" "+holderObject["pathStart"].y+" L"+holderObject["pathEnd"].x+" "+holderObject["pathEnd"].y+"'></path>";
-					path += '</svg>';
-			
-					$(".umlcanvas").append(path);
+					holderObject["pathStart"]["c"].addRelationship(c.className, "references");
+
 					delete holderObject["pathStart"];
 					delete holderObject["pathEnd"];
 				}
@@ -125,6 +123,9 @@ $(document).ready(function(){
 		if(status == "select")
 		{
 			$("#edit_form").addClass("hidden");
+			$("#edit_line_form").addClass("hidden");
+			$("#list_view").removeClass("hidden");
+
 			$(".umlclass.massmove").each(function(){
 				UMLClasses[$(this).attr("id")]
 					.unselect()
@@ -203,7 +204,7 @@ $(document).ready(function(){
 		{
 			return;
 		}else if(type == "empty"){
-			postData["name"] = projectName;
+			postData["projectName"] = projectName;
 		}else if(type == "github"){
 			if(repoName != "null")
 			{
@@ -286,13 +287,23 @@ $(document).ready(function(){
 					t.children().each(function(){
 						$(this).addClass("fa-check");
 					});
+
 					$.each(data.data, function(key, value){
 						var umlClass = new UMLClass(value);
 					});
 
+					$("#list_view").empty();					
+
 					$.each(UMLClasses, function(id, umlClass){
-						$.each(umlClass.relationships, function(key, className){
-							umlClass.addRelationship(className);
+
+						addClassToListView(umlClass);
+
+						$.each(umlClass.relationships, function(type, relations){
+							console.log(type, relations);
+							$.each(relations, function(key, className){
+								console.log(key, className);
+								umlClass.addRelationship(className, type);
+							});
 						});
 					});
 
