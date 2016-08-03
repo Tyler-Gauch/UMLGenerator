@@ -20,7 +20,8 @@ class CreateProjectTypeLanguageTables extends Migration
         });
 
          // Insert "github" and "empty" project types
-        DB::table("project_types")->insert(["name"=>"github"], ["name"=>"empty"]);
+        DB::table("project_types")->insert(["name"=>"github"]);
+        DB::table("project_types")->insert(["name"=>"empty"]);
 
         // Create languages table
         Schema::create("languages", function(Blueprint $table) {
@@ -38,7 +39,11 @@ class CreateProjectTypeLanguageTables extends Migration
             array(
                 "name"     => "PHP",
                 "enabled"  => false
-                )
+            ),
+            array(
+                "name"     => "None",
+                "enabled"  => true
+            )
             ]);
 
         // Create projects table

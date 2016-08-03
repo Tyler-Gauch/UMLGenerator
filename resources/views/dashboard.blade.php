@@ -161,13 +161,30 @@
 	      	</div>
 	      	<div class="row hidden" id="new_empty_project">
 	      		<div class="form-group">
-	        		<div class="col-lg-4">
-	        			<label>Project Name:</label>
+		        	<div class="col-lg-12">
+
+		        		<div class="col-lg-4">
+	    	    			<label>Project Name:</label>
+	        			</div>
+	        			<div class="col-lg-8">
+		        			<input type="text" id="new_project_name" class="form-control" />
+	        			</div>		        		
 	        		</div>
-	        		<div class="col-lg-8">
-		        		<input type="text" id="new_project_name" class="form-control" />
-	        		</div>		        		
-	        	</div>
+        			<!-- <div class="col-lg-12">
+		        		<div class="col-lg-4">
+			        		<label>Language</label>
+			        	</div>
+			        	<div class="col-lg-8">
+			        		<select id="new_project_language" class="form-control">
+			        			<option value="null">Please Select a Language</option>
+			        			<option value="java">JAVA</option>
+			        			<option value="php" disabled>PHP-Coming Soon</option>
+			        		</select>
+			        	</div>
+			        </div> -->
+			        </div>
+		        </div>
+
 	      	</div>
 	      	<div class="row hidden" id="new_git_project">
 		        <div class="col-lg-12">

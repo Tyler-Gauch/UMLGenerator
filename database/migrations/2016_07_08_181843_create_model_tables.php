@@ -13,13 +13,25 @@ class CreateModelTables extends Migration
     public function up()
     {
 
+        Schema::create("models", function(Blueprint $table) {
+            $table->increments('id')->unsigned();
+            $table->string('branch')->nullable();
+            $table->integer('model_id')->unsigned();
+            $table->integer('project_id')->unsigned();
+
+            $table->foreign('project_id')->references('id')->on('projects');
+        });
+
         Schema::create("classes", function(Blueprint $table){
             $table->increments('id')->unsigned();
+            $table->integer('model_id')->unsigned();
             $table->integer('locationX');
             $table->integer('locationY');
             $table->string('name');
             $table->string('type');
-            $table->string('package');
+            $table->string('package')->nullable();
+
+            $table->foreign('model_id')->references('id')->on('models');
         });
 
         Schema::create("operations", function(Blueprint $table){
@@ -28,7 +40,7 @@ class CreateModelTables extends Migration
             $table->string('name');
             $table->string('visibility');
             $table->string('return_type');
-            $table->string('parameters');
+            $table->string('parameters')->nullable();
 
             $table->foreign('class_id')->references('id')->on('classes');
         });
@@ -39,25 +51,9 @@ class CreateModelTables extends Migration
             $table->string('name');
             $table->string('visibility');
             $table->string('type');
-            $table->string('default_value');
+            $table->string('default_value')->nullable();
 
             $table->foreign('class_id')->references('id')->on('classes');
-        });
-
-        Schema::create("modelTypes", function(Blueprint $table) {
-            $table->increments('id')->unsigned();
-            $table->string('name');
-        });
-
-        Schema::create("models", function(Blueprint $table) {
-            $table->increments('id')->unsigned();
-            $table->string('name');
-            $table->string('branch');
-            $table->integer('model_id')->unsigned();
-            $table->integer('project_id')->unsigned();
-
-            $table->foreign('model_id')->references('id')->on('modelTypes');
-            $table->foreign('project_id')->references('id')->on('projects');
         });
 
     }

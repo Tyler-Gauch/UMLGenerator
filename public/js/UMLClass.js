@@ -5,6 +5,9 @@ var UMLClassSaveURL;
 
 var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 	
+	UMLClassSaveURL = window.location.pathname + "/save";
+	console.log("Save clicked. URL: " + UMLClassSaveURL);
+
 	var postData = {};
 	var k = 0;
 	$.each(UMLClasses, function(key, value){

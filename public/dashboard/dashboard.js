@@ -11,10 +11,6 @@ $(document).ready(function(){
 			  }).get(0).dispatchEvent(evt);
 		});
 
-		$("#save_project").on("click", function() {
-			console.log("Save clicked");
-		});
-
 		$(".umlcanvas").on("contextmenu", function(e){
 			if(status == "draw_line"){
 				e.preventDefault();
@@ -207,14 +203,15 @@ $(document).ready(function(){
 		{
 			return;
 		}else if(type == "empty"){
-			postData["name"] = projectName;
+			postData["name"] 		= projectName;
+			postData["language"] 	= "None";
 		}else if(type == "github"){
 			if(repoName != "null")
 			{
 				postData["repoName"] = repoName;
 				postData["language"] = language;
 			}else{
-				postData["repoUrl"] = url;
+				postData["repoUrl"]  = url;
 			}
 		}
 
