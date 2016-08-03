@@ -18,6 +18,8 @@
 					@if(isset($github))
 						<a class="btn btn-social btn-block btn-github" href="{{ $github }}"><span class="fa fa-github"></span> GitHub</a>
 					@endif
+					<br/>
+					<a href="/">Continue as guest</a>
 				</div>
 			</div>
 		</div>

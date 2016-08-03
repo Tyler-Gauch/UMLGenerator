@@ -58,6 +58,11 @@
 				left: 35%
 			}
 
+			#loaderLabel{
+				font-size: 24;
+				font-weight: 150;
+			}
+
 		</style>
 
 		@yield("stylesheets")
@@ -100,9 +105,15 @@
 				@yield('content')
 		</div>
 
-	<div class="modal fade" tabindex="-1" role="dialog" id="loader">
+	<div class="modal fade" tabindex="-1" role="dialog" id="loader" data-backdrop="static" data-keyboard="false" >
 	  <div class="modal-dialog">
-	    <img src="/gears.gif"/>
+	  	<div class="row">
+	    	<div class="col-lg-12">
+	    		<img src="/gears.gif"/>
+	    	</div>
+	    	<div class="col-lg-12" id="loaderLabel">
+	    	</div>
+	    </div>
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
@@ -115,8 +126,12 @@
 		
 		window.showLoader = function(message = "Loading..."){
 			$("#loader").modal("show");
+			$("#loaderLabel").text(message);
 		}
 
+		window.hideLoader = function(){
+			$("#loader").modal("hide");
+		}		
 
 	</script>
 

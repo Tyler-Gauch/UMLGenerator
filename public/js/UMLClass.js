@@ -111,21 +111,37 @@ UMLClass.prototype = {
 					uml += '<text class="umlclass-name-text" unselectable="on" text-anchor="middle" fill="black" stroke-width="0px" x="'+(x+this.width/2)+'" y="'+(y+30)+'">'+this.className+'</text>';
 					y += nameHeight+15;
 					$.each(this.attributes, (function(key, attribute){
+						if(attribute.default == null)
+						{
+							attribute.default = "";
+						}
 						var text = this.getVisibilityToken(attribute.visibility)+" "+attribute.name+" : "+attribute.type;
-						if(attribute.default != null)
+						if(attribute.default != "")
 						{
 							text += " = "+attribute.default;
 						}
 						var extraAttributes = "";
-						if(attribute.isStatic || attribute.isFinal)
+						if(attribute.isStatic)
 						{
 							extraAttributes += " text-decoration='underline'";
+						}
+						if(attribute.isFinal)
+						{
+							text += " {readOnly}";
 						}
 						uml += '<text class="umlclass-attributes-text" fill="black" stroke-width="0px" x="'+x+'" y="'+y+'" '+extraAttributes+'>'+text+'</text>';
 						y+=15;
 					}).bind(this));
 					y+=10;
 					$.each(this.functions, (function(key, func){
+						if(func.parameters.indexOf("(") != 0)
+						{
+							func.parameters = "("+func.parameters;
+						}
+						if(func.parameters.indexOf(")") != func.parameters.length -1)
+						{
+							func.parameters += ")";
+						}
 						var text = this.getVisibilityToken(func.visibility)+" "+func.name+func.parameters;
 						
 						if(func.type != null)

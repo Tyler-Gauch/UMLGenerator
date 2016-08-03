@@ -75,11 +75,11 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 
 			var attrs = $("#edit_attributes");
 			attrs.empty();
-			$.each(c.attributes, function(key, value){appendEditAttribute(key, value)});
+			$.each(c.attributes, function(key, value){appendEditAttribute(key, c)});
 
 			var funcs = $("#edit_functions");
 			funcs.empty();
-			$.each(c.functions, function(key, value){appendEditFunction(key, value)});
+			$.each(c.functions, function(key, value){appendEditFunction(key, c)});
 
 			$("#edit_form").removeClass("hidden");
 		}else{

@@ -173,7 +173,7 @@ class JavaParserHelper extends ParserHelper {
 							"visibility" => $lastVisibility,
 							"isStatic" => $isStatic,
 							"isFinal" => $isFinal,
-							"isabstract" => $isAbstract,
+							"isAbstract" => $isAbstract,
 							"parameters" => $params
 						];
 						if($name != $results["className"])
@@ -199,7 +199,7 @@ class JavaParserHelper extends ParserHelper {
 								"default" => $attribute["default"],
 								"isStatic" => $isStatic,
 								"isFinal" => $isFinal,
-								"isabstract" => $isAbstract
+								"isAbstract" => $isAbstract
 							];
 						}
 					}
