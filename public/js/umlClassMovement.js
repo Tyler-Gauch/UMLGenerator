@@ -102,8 +102,7 @@ $(document).on("mousemove touchmove", function(e){
 			return;
 		}
 
-		needsSave = true;
-		lastAction = new Date().getTime();
+		setClassEdited(c);
 
 		var viewBoxValue = parseInt($(".umlcanvas")[0].getAttribute("viewBox").split(" ")[2]);
 		var dx = (e.clientX - currentX) * (viewBoxValue/viewBoxDefault);

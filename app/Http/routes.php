@@ -15,6 +15,7 @@ Route::group(["prefix" => "/auth"], function(){
 	Route::get("/", "Auth\\AuthController@login");
 	Route::get("/github", "Auth\\AuthController@loginWithGithub");	
 	Route::get('/logout', 'Auth\AuthController@getLogout');
+	Route::get("guest", "Auth\\AuthController@loginAsGuest");
 	
 });
 

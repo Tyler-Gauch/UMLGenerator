@@ -155,23 +155,30 @@ $(document).ready(function(){
 	$(".new_project").on("click", function(e){
 		e.preventDefault();
 
-		getRepoNames(function(data){
-			if(data.success)
-			{
-				var modal = $("#new_project_modal");
-				var repoList = $("#new_project_repo");
+		if(!userIsGuest)
+		{
+			$("#new_project_repo").removeClass("hidden");
+			getRepoNames(function(data){
+				if(data.success)
+				{
+					var modal = $("#new_project_modal");
+					var repoList = $("#new_project_repo");
 
-				repoList.empty();
-				repoList.append("<option value='null'>Please Select a Repository</option>");
+					repoList.empty();
+					repoList.append("<option value='null'>Please Select a Repository</option>");
 
-				$.each(data.repos, function(key, value){
-					repoList.append("<option value='"+value+"'>"+value+"</option>");
-				});
+					$.each(data.repos, function(key, value){
+						repoList.append("<option value='"+value+"'>"+value+"</option>");
+					});
 
-				modal.modal("show");
-			}
-		});
-		
+					modal.modal("show");
+				}
+			});
+		}else{
+			$("#new_project_repo").empty();
+			$("#new_project_repo").addClass("hidden");
+			$("#new_project_modal").modal("show");
+		}
 	});
 
 	$("#new_project_create").on("click", function(e){
@@ -220,6 +227,30 @@ $(document).ready(function(){
 				}
 			}
 		});
+	});
+
+	$("#new_project_type").on("change", function(){
+		var type = $(this).val();
+
+		if(type == "null")
+		{
+			$("#new_git_project").addClass("hidden");
+			$("#new_empty_project").addClass("hidden");
+			$("#new_project_create").addClass("hidden");
+		}else if(type == "empty"){
+			$("#new_empty_project").removeClass("hidden");
+			$("#new_git_project").addClass("hidden");
+			$("#new_project_create").removeClass("hidden");
+		}else if(type == "github"){
+			$("#new_git_project").removeClass("hidden");
+			$("#new_empty_project").addClass("hidden");
+			$("#new_project_create").removeClass("hidden");
+		}
+	});
+
+	$("#open_project_settings").on("click", function(){
+		$("#project_settings_name").val($("#project_name").data("project"));
+		$("#project_settings").modal("show");
 	});
 
 	function getRepoNames(callback){
@@ -300,6 +331,8 @@ $(document).ready(function(){
 							});
 						});
 					});
+
+					needsSave = true;
 
 				}else{
 					alert("Error: "+data.message);

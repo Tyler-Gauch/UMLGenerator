@@ -13,6 +13,7 @@
       			New Project <span class="hot_key pull-right">CTRL+N</span>
       		</a>
       	</li>
+      	@if(Auth::user()->hasRole("USER"))
       	<li>
       		<a href="#" class="clear-fix open_project">
       			Open Project <span class="hot_key pull-right">CTRL+O</span>
@@ -28,6 +29,7 @@
       			Project Settings<span class="hot_key pull-right"></span>
       		</a>
       	</li>
+      	@endif
       	@if(isset($branches))
       		<li>
 	      		<a href="#" id="force_github_load" class="clear-fix">
@@ -60,6 +62,7 @@
     <button id="select" class="btn btn-primary btn-toolbar btn-warning navbar-btn" type="button"><i class="fa fa-mouse-pointer"></i></button>
     <button id="draw_line" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows-h"></i></button>
     <button id="scale" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows"></i></button>
+
 @endsection
 
 @section("content")
@@ -281,6 +284,11 @@
 		        </div>
 	      	</div>
 	      	<div class="row hidden" id="new_git_project">
+	      		@if(Auth::user()->hasRole("GUEST"))
+	      			<div class="col-lg-12">
+	      				<div class="alert alert-danger">If you would like to use a private repository from your list of repositories, please login!</div>
+	      			</div>
+	      		@endif
 		        <div class="col-lg-12">
 		        	<div class="form-group">
 		        		<div class="col-lg-4">
@@ -292,9 +300,11 @@
 				        			<select id="new_project_repo" class="form-control allow-hotkeys">
 				        			</select>
 			        			</div>
-			        			<div class="col-lg-12" style="text-align: center">
-			        			OR
-			        			</div>
+			        			@if(Auth::user()->hasRole("USER"))
+				        			<div class="col-lg-12" style="text-align: center">
+				        			OR
+				        			</div>
+			        			@endif
 		        				<div class="col-lg-12">
 			        				<input type="text" id="new_project_url" class="form-control allow-hotkeys" placeholder="Public Github URL" />
 		        				</div>
@@ -383,9 +393,8 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
-	<div id="subtle_save">
-	 	<button class="close" id="close_subtle_save"><span aria-hidden="true">&times;</span></button>
-		<strong>All changes have been saved!</strong>
+	<div id="subtle_save_gear">
+	 	<img src="gears.gif"/>Saving...
 	</div>
 
 @endsection
@@ -406,6 +415,8 @@
 		var projectName = "{{ $project->name }}";
 		UMLClassSaveURL = projectName+"/save";
 		@endif
+
+		var userIsGuest = @if(Auth::user()->hasRole("GUEST")) true @else false @endif
 
 		//blade variables
 
@@ -486,32 +497,70 @@
 		};
 
 		function save(beSubtle = false){
-			if(!needsSave)
-				return;
+			@if(Auth::user()->hasRole("USER"))
+				if(!needsSave)
+					return;
 
-			if(!beSubtle){
-				window.showLoader("Please Wait.  Saving in Progess...");
-			}
-			UMLClassSaveAll(window.hideLoader());
-			needsSave = false;
-			if(beSubtle)
-			{
-				$("#subtle_save").fadeIn(500);
-				var wait = setTimeout(function(){ 
-					$("#subtle_save").fadeOut(2500);
-					clearTimeout(wait)
-				}, 4000); //just give some delay
-			}
+				if(!beSubtle){
+					window.showLoader("Please Wait.  Saving in Progess...");
+				}else{
+					$("#subtle_save_gear").css("display", "block");
+				}
+				UMLClassSaveAll(window.hideLoader());
+				delete holderObject["editedClasses"];
+				needsSave = false;
+				if(beSubtle)
+				{
+					$("#subtle_save_gear").css("display", "none");
+				}
+			@endif
 		}
 
-		setInterval(function(){
-			var currentTime = new Date().getTime();
+		function setClassEdited(umlClass)
+		{
+			@if(Auth::user()->hasRole("USER"))
+				if(holderObject["editedClasses"] == undefined)
+				{
+					holderObject["editedClasses"] = [];	
+				}
 
-			if(needsSave && currentTime - lastAction > autoSaveTimeout)
-			{
-				save(true);
-			}
-		}, 500);
+				var exists = false;
+				$.each(holderObject["editedClasses"], function(key, value){
+					if(value.id == umlClass.id){
+						exists = true;
+						return;
+					}
+				});
+
+				if(!exists)
+					holderObject["editedClasses"].push(umlClass);
+				
+				needsSave = true;
+				lastAction = new Date().getTime();
+			@endif
+		}
+
+		@if(Auth::user()->hasRole("USER"))
+			setInterval(function(){
+				var currentTime = new Date().getTime();
+
+				if(needsSave && currentTime - lastAction > autoSaveTimeout)
+				{
+					save(true);
+				}
+			}, 500);
+
+			setInterval(function(){
+				$(".list_view_element").find("span").remove();
+				if(needsSave)
+				{
+					console.log("Needs save");
+					$.each(holderObject["editedClasses"], function(key, umlClass){
+						$("#list_view_class_"+umlClass.id).append("<span>*</span>");
+					});
+				}
+			}, 100);
+		@endif
 
 	</script>
 
@@ -520,26 +569,10 @@
 	<script src="/js/editForm.js"></script>
 	<script src="/js/umlClassMovement.js"></script>
 	<script src="/dashboard/dashboard.js"></script>
-
+	<script src="/dashboard/hotkeys.js"></script>
 	<script>
 
 		$(document).ready(function(){
-
-			$("#close_subtle_save").on("click", function(){
-				$("#subtle_save").css("display", "none");
-			});
-
-			$(document).bind('keydown', 'ctrl+s', function(e) {
-			    e.preventDefault();
-		    	save();
-			    return false;
-			});
-
-			$(".allow-hotkeys").bind("keydown", "ctrl+s", function(e){
-				e.preventDefault();
-		    	save();
-			    return false;
-			});
 
 			$("#save_project").on("click", function(){
 				save();
@@ -557,30 +590,6 @@
 					loadProjectModels();
 				@endif
 			@endif
-
-			$("#new_project_type").on("change", function(){
-				var type = $(this).val();
-
-				if(type == "null")
-				{
-					$("#new_git_project").addClass("hidden");
-					$("#new_empty_project").addClass("hidden");
-					$("#new_project_create").addClass("hidden");
-				}else if(type == "empty"){
-					$("#new_empty_project").removeClass("hidden");
-					$("#new_git_project").addClass("hidden");
-					$("#new_project_create").removeClass("hidden");
-				}else if(type == "github"){
-					$("#new_git_project").removeClass("hidden");
-					$("#new_empty_project").addClass("hidden");
-					$("#new_project_create").removeClass("hidden");
-				}
-			});
-
-			$("#open_project_settings").on("click", function(){
-				$("#project_settings_name").val($("#project_name").data("project"));
-				$("#project_settings").modal("show");
-			});
 
 			$(document).on("click", ".line", function(e){
 				e.preventDefault();

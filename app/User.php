@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Role;
+use Log;
 
 class User extends Authenticatable
 {
@@ -23,4 +25,56 @@ class User extends Authenticatable
     protected $hidden = [
         'remember_token',
     ];
+
+    /**
+    * Get the roles a user has
+    */
+    public function Roles()
+    {
+       return $this->belongsToMany('App\\Models\\Role', "user_roles");
+    }
+
+    /**
+     * Get key in array with corresponding value
+     *
+     * @return int
+     */
+    private function getIdInArray($array, $term)
+    {
+        foreach ($array as $key => $value) {
+            if ($value == $term) {
+                return $key;
+            }
+        }
+        return -1;
+    }
+
+    function addRole($role)
+    {
+        $roles = Role::all()->toArray();
+
+        $id = $this->getIdInArray($roles, $role);
+
+        if($id == -1)
+        {
+            Log::error("Role: {$role} not found");
+            return;
+        }
+
+        $this->Roles()->attach($id);
+    }
+
+    function hasRole($role)
+    {
+        Log::info("hasRole($role)");
+        foreach($this->roles as $key=>$value)
+        {
+            Log::info("{$value->name} == $role");
+            if($value->name == $role)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
