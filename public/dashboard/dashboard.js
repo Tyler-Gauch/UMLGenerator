@@ -275,6 +275,13 @@ $(document).ready(function(){
 						});
 					}
 
+					//remove all the current classes
+					$.each(UMLClasses, function(id, umlClass){
+						umlClass.destroy();
+					});
+
+					$("#edit_target").val("null");
+
 					$.each(data.data, function(key, value){
 						var umlClass = new UMLClass(value);
 					});

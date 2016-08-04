@@ -102,6 +102,9 @@ $(document).on("mousemove touchmove", function(e){
 			return;
 		}
 
+		needsSave = true;
+		lastAction = new Date().getTime();
+
 		var viewBoxValue = parseInt($(".umlcanvas")[0].getAttribute("viewBox").split(" ")[2]);
 		var dx = (e.clientX - currentX) * (viewBoxValue/viewBoxDefault);
 		var dy = (e.clientY - currentY) * (viewBoxValue/viewBoxDefault);
@@ -136,9 +139,6 @@ $(document).on("mouseup touchend", ".umlclass", function(e){
 		if(!e.ctrlKey && $(this).attr("id") != $thisId)
 		{
 			c.getNode().removeClass("massmove");
-		}else if($(this).attr("id") == $thisId)
-		{
-			c.render();
 		}
 	});
 });

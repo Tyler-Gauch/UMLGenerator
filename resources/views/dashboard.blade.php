@@ -106,7 +106,7 @@
 							<label>Start Marker:</label>
 						</div>
 						<div class="row">
-							<select id="edit_line_start" class="form-control">
+							<select id="edit_line_start" class="form-control allow-hotkeys">
 								<option value="none">None</option>
 								<option value="arrowEmpty">Arrow</option>
 								<option value="arrowFill">Arrow Filled</option>
@@ -122,7 +122,7 @@
 							<label>Line Type:</label>
 						</div>
 						<div class="row">
-							<select id="edit_line_type" class="form-control">
+							<select id="edit_line_type" class="form-control allow-hotkeys">
 								<option value="solid">Solid</option>
 								<option value="dotted">Dotted</option>
 							</select>
@@ -135,7 +135,7 @@
 							<label>End Marker:</label>
 						</div>
 						<div class="row">
-							<select id="edit_line_end" class="form-control">
+							<select id="edit_line_end" class="form-control allow-hotkeys">
 								<option value="none">None</option>
 								<option value="arrowEmpty">Arrow</option>
 								<option value="arrowFill">Arrow Filled</option>
@@ -161,7 +161,7 @@
 							<label>Name:</label>
 						</div>
 						<div class="row">
-							<input type="text" id="edit_classname" class="form-control"/>
+							<input type="text" id="edit_classname" class="form-control allow-hotkeys"/>
 						</div>
 					</div>
 				</div>
@@ -171,7 +171,7 @@
 							<label>Class Type: </label>
 						</div>
 						<div class="row">
-							<select class="form-control" id="edit_class_type">
+							<select class="form-control allow-hotkeys" id="edit_class_type">
 								<option value="class">Class</option>
 								<option value="abstract">Abstract</option>
 								<option value="interface">Interface</option>
@@ -190,7 +190,7 @@
 						<div class="row" style="padding-top: 10px">
 							<div class="col-lg-12">
 								<div class="input-group">
-									<input type="text" id="edit_attributes_add" class="form-control"/>
+									<input type="text" id="edit_attributes_add" class="form-control allow-hotkeys"/>
 									<span class="input-group-btn">
 										<button class="btn btn-primary" id="edit_attributes_add_btn">+</button>
 									</span>
@@ -209,7 +209,7 @@
 						<div class="row" style="padding-top: 10px">
 							<div class="col-lg-12">
 								<div class="input-group">
-									<input type="text" id="edit_functions_add" class="form-control"/>
+									<input type="text" id="edit_functions_add" class="form-control allow-hotkeys"/>
 									<span class="input-group-btn">
 										<button class="btn btn-primary" id="edit_functions_add_btn">+</button>
 									</span>
@@ -258,7 +258,7 @@
 	      					<label>Project Type:</label>
 	      				</div>
 	      				<div class="col-lg-8">
-	      					<select id="new_project_type" class="form-control">
+	      					<select id="new_project_type" class="form-control allow-hotkeys">
 	      						<option value="null">Please Choose a Project Type</option>
 	      						<option value="empty">Empty Project</option>
 	      						<option value="github">Github Project</option>
@@ -275,7 +275,7 @@
 	    	    			<label>Project Name:</label>
 	        			</div>
 	        			<div class="col-lg-8">
-		        			<input type="text" id="new_project_name" class="form-control" />
+		        			<input type="text" id="new_project_name" class="form-control allow-hotkeys" />
 	        			</div>		        		
 	        		</div>
 		        </div>
@@ -289,14 +289,14 @@
 		        		<div class="col-lg-8">
 		        			<div class="row">
 		        				<div class="col-lg-12">
-				        			<select id="new_project_repo" class="form-control">
+				        			<select id="new_project_repo" class="form-control allow-hotkeys">
 				        			</select>
 			        			</div>
 			        			<div class="col-lg-12" style="text-align: center">
 			        			OR
 			        			</div>
 		        				<div class="col-lg-12">
-			        				<input type="text" id="new_project_url" class="form-control" placeholder="Public Github URL" />
+			        				<input type="text" id="new_project_url" class="form-control allow-hotkeys" placeholder="Public Github URL" />
 		        				</div>
 		        			</div>
 		        		</div>		        		
@@ -307,7 +307,7 @@
 		        		<label>Language</label>
 		        	</div>
 		        	<div class="col-lg-8">
-		        		<select id="new_project_language" class="form-control">
+		        		<select id="new_project_language" class="form-control allow-hotkeys">
 		        			<option value="null">Please Select a Language</option>
 		        			<option value="java">JAVA</option>
 		        			<option value="php" disabled>PHP-Coming Soon</option>
@@ -339,7 +339,7 @@
 		        			<label>Project Name</label>
 		        		</div>
 		        		<div class="col-lg-8">
-		        			<select id="open_project_name" class="form-control">
+		        			<select id="open_project_name" class="form-control allow-hotkeys">
 		        			</select>
 		        		</div>
 		        	</div>
@@ -369,7 +369,7 @@
 		        			<label>Project Name</label>
 		        		</div>
 		        		<div class="col-lg-8">
-		        			<input type="text" class="form-control" id="project_settings_name"/>
+		        			<input type="text" class="form-control allow-hotkeys" id="project_settings_name"/>
 		        		</div>
 		        	</div>
 		        </div>
@@ -383,6 +383,11 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
+	<div id="subtle_save">
+	 	<button class="close" id="close_subtle_save"><span aria-hidden="true">&times;</span></button>
+		<strong>All changes have been saved!</strong>
+	</div>
+
 @endsection
 
 @section("javascript")
@@ -394,6 +399,9 @@
 		var holderObject = {};
 		var viewBoxDefault = 5000;
 		var defaultMarker = "arrowFill";
+		var needsSave = false;
+		var lastAction = new Date().getTime();
+		var autoSaveTimeout = 2500; //inactivity for more than x milliseconds triggers an autosave
 		@if(isset($project))
 		var projectName = "{{ $project->name }}";
 		UMLClassSaveURL = projectName+"/save";
@@ -438,7 +446,7 @@
 			$("#edit_form").removeClass("hidden");
 			$("#list_view").addClass("hidden");
 			$("#edit_line_form").addClass("hidden");
-
+			needsSave = true;
 		}
 		@if(isset($project))
 			function loadProjectModels(branch = null, callback=function(){}){	
@@ -465,8 +473,49 @@
 				});
 			}
 		@endif
+
+		$(window).unload(function() {
+		      alert('Handler for .unload() called.');
+		});
+
+		window.onbeforeunload = function(e) {
+			if(needsSave)
+			{
+		  		return 'You have unsaved changes, are you sure you want to leave?';
+		  	}
+		};
+
+		function save(beSubtle = false){
+			if(!needsSave)
+				return;
+
+			if(!beSubtle){
+				window.showLoader("Please Wait.  Saving in Progess...");
+			}
+			UMLClassSaveAll(window.hideLoader());
+			needsSave = false;
+			if(beSubtle)
+			{
+				$("#subtle_save").fadeIn(500);
+				var wait = setTimeout(function(){ 
+					$("#subtle_save").fadeOut(2500);
+					clearTimeout(wait)
+				}, 4000); //just give some delay
+			}
+		}
+
+		setInterval(function(){
+			var currentTime = new Date().getTime();
+
+			if(needsSave && currentTime - lastAction > autoSaveTimeout)
+			{
+				save(true);
+			}
+		}, 500);
+
 	</script>
 
+	<script src="/js/jquery-hotkeys.js"></script>
 	<script src="/js/UMLClass.js"></script>
 	<script src="/js/editForm.js"></script>
 	<script src="/js/umlClassMovement.js"></script>
@@ -475,9 +524,25 @@
 	<script>
 
 		$(document).ready(function(){
+
+			$("#close_subtle_save").on("click", function(){
+				$("#subtle_save").css("display", "none");
+			});
+
+			$(document).bind('keydown', 'ctrl+s', function(e) {
+			    e.preventDefault();
+		    	save();
+			    return false;
+			});
+
+			$(".allow-hotkeys").bind("keydown", "ctrl+s", function(e){
+				e.preventDefault();
+		    	save();
+			    return false;
+			});
+
 			$("#save_project").on("click", function(){
-				window.showLoader("Please Wait.  Saving in Progess...");
-				UMLClassSaveAll(window.hideLoader());
+				save();
 			});
 
 			$(document).on("click", ".list_view_element", function(){
