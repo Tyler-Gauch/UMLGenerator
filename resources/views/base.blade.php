@@ -54,13 +54,17 @@
 
 			#loader{
 				position: absolute; 
-				top:35%; 
-				left: 35%
+				top:30%; 
+				left: 30%;
+				width:500px;
+				height: 500px;
+				text-align: center;
 			}
 
 			#loaderLabel{
 				font-size: 24;
 				font-weight: 150;
+				text-align: center;
 			}
 
 		</style>

@@ -20,7 +20,8 @@ Route::group(["prefix" => "/auth"], function(){
 
 Route::group(["middleware" => 'auth'], function(){
 	Route::get('/{project?}', "DashboardController@index");
-	Route::post('/{project}/save', "ProjectController@save");
+	Route::post('/{project}/save/{branch?}', "ProjectController@save");
+	Route::any('/{project}/load', "ProjectController@load");
 
 	Route::post("/parser/java", "ParserController@javaParser");
 	Route::get("/parser/{repo}/{branch}", "ParserController@parseBranch");

@@ -25,7 +25,7 @@ class ModelObj extends Model
         'branch', 'project_id'
     ];
 
-    public function ClassObj(){
+    public function Classes(){
         return $this->hasMany("App\\Models\\ClassObj", "model_id");
     }
 }

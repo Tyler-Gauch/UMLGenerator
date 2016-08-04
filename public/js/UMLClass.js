@@ -1,23 +1,20 @@
 var UMLClassID = 0;
 var UMLClassX = 10;
 var UMLClassY = 10;
-var UMLClassSaveURL;
 
 var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 	
-	UMLClassSaveURL = window.location.pathname + "/save";
-	console.log("Save clicked. URL: " + UMLClassSaveURL);
-
 	var postData = {};
-	var k = 0;
+	var k  = 0;
+
 	$.each(UMLClasses, function(key, value){
 		postData[k++] = value.serialize(); 
 	});
 
-	console.log(JSON.stringify(postData));
+	console.log(postData);
 
 	$.ajax({
-		url: UMLClassSaveURL,
+		url: UMLClassSaveURL+"/"+$("#current_branch").val(), //declared global in dashboard.blade.php 
 		method: "POST",
 		data: postData,
 		success: successCB,
@@ -402,13 +399,45 @@ UMLClass.prototype = {
 		return $("#class_"+this.id);
 	},
 	serialize: function(){
+
+		var funcs = [];
+		$.each(this.functions, function(key, value){
+			var f  = {};
+			f["name"] = (value.name == undefined ? "NO_NAME" : value.name);
+			f["visibility"] = (value.visibility == undefined ? "public" : value.visibility);
+			f["type"] = (value.type == undefined ? "" : value.type);
+			f["parameters"] = (value.parameters == undefined ? "()" : value.parameters);
+			f["isStatic"] = (value.isStatic == undefined ? false : value.isStatic);
+			f["isFinal"] = (value.isFinal == undefined ? false : value.isFinal);
+			f["isAbstract"] = (value.isAbstract == undefined ? false : value.isAbstract);
+			if(f.length < 7)
+			{
+				console.log(f);
+			}
+			funcs.push(f);
+		});
+
+		var attr = [];
+		$.each(this.attributes, function(key, value){
+			var a  = {};
+			a["name"] = (value.name == undefined ? "NO_NAME" : value.name);
+			a["visibility"] = (value.visibility == undefined ? "public" : value.visibility);
+			a["type"] = (value.type == undefined ? "" : value.type);
+			a["default"] = (value.default == undefined ? "()" : value.default);
+			a["isStatic"] = (value.isStatic == undefined ? false : value.isStatic);
+			a["isFinal"] = (value.isFinal == undefined ? false : value.isFinal);
+			a["isAbstract"] = (value.isAbstract == undefined ? false : value.isAbstract);
+
+			attr.push(a);
+		});
+
 		return {
 			x: this.x,
 			y: this.y,
 			className: this.className,
 			type: this.classType,
-			attributes: this.attributes,
-			functions: this.functions,
+			attributes: attr,
+			functions: funcs,
 			relationships: this.relationships
 		};
 	},

@@ -24,20 +24,6 @@ $(document).ready(function(){
 			e.preventDefault();
 			addClass();
 		});
-		function addClass(){
-			console.log("Adding new class");
-			var umlclass = new UMLClass({});
-			addClassToListView(umlclass);
-			$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
-			$("#class_"+umlclass.id).mouseup();
-			$("#edit_classname").focus();
-			$("#edit_classname").select();
-			$("#select").click();
-			$("#edit_form").removeClass("hidden");
-			$("#list_view").addClass("hidden");
-			$("#edit_line_form").addClass("hidden");
-
-		}
 
 		$(".btn-toolbar").on("click", function(){
 			if($(this).hasClass("skip-status")){
@@ -204,7 +190,7 @@ $(document).ready(function(){
 		{
 			return;
 		}else if(type == "empty"){
-			postData["name"] 		= projectName;
+			postData["projectName"] = projectName;
 			postData["language"] 	= "None";
 		}else if(type == "github"){
 			if(repoName != "null")
@@ -268,26 +254,26 @@ $(document).ready(function(){
 		});
 	}
 
-	$(".edit_class_branch").on("click", function(e){
-		e.preventDefault();
-		window.showLoader();
-		var t = $(this);
+	function getBranchFromGitHub(project, branch, t = null){
+		window.showLoader("Loading your project from github...");
 		$.ajax({
-			url: "/parser/"+$("#project_name").data("project")+"/"+$(this).data("branch"),
+			url: "/parser/"+project+"/"+branch,
 			method: "GET",
 			success: function(data){
 				window.hideLoader();
 				if(data.success)
 				{
-					$(".edit_class_branch").each(function(){
-						$(this).children().each(function(){
-							$(this).removeClass("fa-check");
+					if(t!=null){
+						$(".edit_class_branch").each(function(){
+							$(this).children().each(function(){
+								$(this).removeClass("fa-check");
+							});
 						});
-					});
 
-					t.children().each(function(){
-						$(this).addClass("fa-check");
-					});
+						t.children().each(function(){
+							$(this).addClass("fa-check");
+						});
+					}
 
 					$.each(data.data, function(key, value){
 						var umlClass = new UMLClass(value);
@@ -311,6 +297,36 @@ $(document).ready(function(){
 				}else{
 					alert("Error: "+data.message);
 				}
+			}
+		});
+	}
+
+	$("#force_github_load").on("click", function(e){
+		e.preventDefault();
+		getBranchFromGitHub(projectName, $("#current_branch").val());
+	});
+
+	$(".edit_class_branch").on("click", function(e){
+		e.preventDefault();
+		window.showLoader("Attempting to load your project...");
+		var t = $(this);
+		$("#current_branch").val(t.data("branch"));
+		loadProjectModels($(this).data("branch"), function(success){
+			console.log("Load: "+success);
+			if(!success)
+			{
+				getBranchFromGitHub(projectName, t.data("branch"), t);
+			}else{
+				window.hideLoader();
+				$(".edit_class_branch").each(function(){
+					$(this).children().each(function(){
+						$(this).removeClass("fa-check");
+					});
+				});
+
+				t.children().each(function(){
+					$(this).addClass("fa-check");
+				});
 			}
 		});
 	});

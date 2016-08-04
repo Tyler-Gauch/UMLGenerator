@@ -24,9 +24,6 @@ class ProjectController extends Controller
          $name = $request->input("name", null);
          $language = $request->input("language", "None");
          $type = $request->input("type", null);
-
-         
-
          $name = null;
          $language = "java";
          $url = null;
@@ -55,13 +52,9 @@ class ProjectController extends Controller
             {
                return response()->json(["success" => false, "message" => "You must choose a Language"]);
             }
+         }
 
-<<<<<<< HEAD
-            $project_type_id = ProjectType::where("name", "=", "github")->first()->id;
-         }else
-=======
          if($type != "empty" && ($language == null || $language == "null" || $language == ""))
->>>>>>> c47d33039660434d6a50f1d05306e7580505fcc3
          {
             return response()->json(["success" => false, "message" => "You must choose a Project Type"]);
          }
@@ -70,11 +63,7 @@ class ProjectController extends Controller
             "name" => $name,
             "language_id" => Language::where("name", "=", $language)->first()->id,
             "user_id" => Auth::user()->id,
-<<<<<<< HEAD
-            "project_type_id" => $project_type_id
-=======
             "project_type_id" => ProjectType::where("name", "=", $type)->first()->id
->>>>>>> c47d33039660434d6a50f1d05306e7580505fcc3
          ]);
 
    		return response()->json(["success" => true]);
@@ -93,14 +82,13 @@ class ProjectController extends Controller
          return response()->json($data);
       }
 
-      public function save(Request $request, $project) {
+      public function save(Request $request, $project, $branch = null) {
 
          // Get the current timestamp which will be used for removing old attributes, functions, and classes later on
          $currentTime = Carbon::now()->toDateTimeString();
          
          // Get the project id of the current project and add the model
          $proj = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
-         $branch = $request->input("branch", null);
 
          // Get the model of the github branch or NULL if empty project
          $model = ModelObj::where("project_id", "=", $proj["id"])->where("branch", "=", $branch)->firstOrCreate(
@@ -179,14 +167,18 @@ class ProjectController extends Controller
                      ]
                   );
 
+
+                  // Log::info(print_r($func, 1));
+
                   // Update the values
-                  $operation->visibility  = $func["visibility"];
-                  $operation->return_type = $func["type"];
-                  $operation->is_static   = $func["isStatic"];
-                  $operation->is_final    = $func["isFinal"];
-                  $operation->is_abstract = $func["isAbstract"];
-                  $operation->parameters  = $func["parameters"];
-                  $operation->updated_at  = $currentTime; 
+                  //for some reason some values are getting lost when sent form the front end
+                  $operation->visibility  = ( isset($func["visibility"]) ? $func["visibility"] : "public");
+                  $operation->return_type = ( isset($func["type"]) ? $func["type"] : ""); //constructors have no type
+                  $operation->is_static   = ( isset($func["isStatic"]) ? $func["isStatic"] : false);
+                  $operation->is_final    = ( isset($func["isFinal"]) ? $func["isFinal"] : false);
+                  $operation->is_abstract = ( isset($func["isAbstract"]) ? $func["isAbstract"] : false);
+                  $operation->parameters  = ( isset($func["parameters"]) ? $func["parameters"] : "()");
+                  // $operation->updated_at  = $currentTime; //not needed this is auto handled by the ->save() function
 
                   $operation->save();
 
@@ -212,5 +204,81 @@ class ProjectController extends Controller
          }
       }
 
+
+      public function load(Request $request, $project = null)
+      {
+         if($project == null)
+         {
+            return response()->json(["success" => false, "message" => "You must provide a project"]);
+         }
+
+         $project = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
+
+         $branch = $request->input("branch", null);
+
+         
+         $model = null;
+
+         if($branch == null)
+         {
+            $model = $project->Models()->first();
+         }else{
+            $model = $project->Models()->where("branch", "=", $branch)->first();            
+         }
+
+         if($model == null)
+         {
+            return response()->json(["success" => false, "message" => "We were unable to get your model"]);
+         }
+
+         //get all project information and build required data structures
+         $m = [];
+
+         foreach($model->Classes()->get() as $class){
+            $c = [];
+            $c["className"] = $class->name;
+            $c["x"] = $class->locationX;
+            $c["y"] = $class->locationY;
+            $c["classType"] = $class->type;
+            $c["package"] = $class->package;
+            $c["attributes"] = [];
+            $c["functions"] = [];
+            $c["relationships"] = [];
+
+            foreach($class->Attributes()->get() as $attribute)
+            {  
+               $a = [];
+               $a["name"] = $attribute->name;
+               $a["visibility"] = $attribute->visibility;
+               $a["type"] = $attribute->type;
+               $a["default"] = $attribute->default_value;
+               $a["isStatic"] = $attribute->is_static;
+               $a["isFinal"] = $attribute->is_final;
+               $a["isabstract"] = $attribute->is_abstract;
+               $c["attribtues"][] = $a;
+
+            }
+            foreach($class->Operations()->get() as $operation)
+            {
+               $o = [];
+               $o["name"] = $operation->name;
+               $o["visibility"] = $operation->visibility;
+               $o["type"] = $operation->type;
+               $o["parameters"] = $operation->parameters;
+               $o["isStatic"] = $operation->is_static;
+               $o["isFinal"] = $operation->is_final;
+               $o["isabstract"] = $operation->is_abstract;
+               $c["functions"][] = $o;
+            }
+
+            $m[] = $c;
+         }
+         
+         $data = [];
+         $data["success"] = true;
+         $data["model"] = $m;
+
+         return response()->json($data);
+      }
    
 }

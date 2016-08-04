@@ -22,12 +22,7 @@ class DashboardController extends Controller
             $data["project"] = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
 
             // Get the project type
-            $type = DB::table('project_types')
-                  ->join('projects', 'project_types.id', '=', 'projects.project_type_id')
-                  ->select('project_types.name as type_name', 'projects.user_id', 'projects.name as proj_name')
-                  ->where('projects.user_id', '=', Auth::user()->id)
-                  ->where('projects.name', '=', $project)
-                  ->get();
+            $type = $data["project"]->ProjectType;
 
             // echo '<pre>';
             // foreach ($type as $t) {
@@ -36,9 +31,8 @@ class DashboardController extends Controller
             // echo'</pre>';
 
             // Get the github branches only if the project is of type github
-            if ($type[0]->type_name != "empty") {
+            if ($type->name != "empty") {
                $github = new GitHubHelper(Auth::user());
-
                $data["branches"] = $github->listBranches($project);
            }
    		}

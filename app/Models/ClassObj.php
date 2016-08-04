@@ -26,10 +26,10 @@ class ClassObj extends Model
         'locationX', 'locationY', 'name', 'type', 'package', 'model_id'
     ];
 
-    public function Attribute(){
+    public function Attributes(){
         return $this->hasMany("App\\Models\\Attribute", "class_id");
     }
-    public function Operation() {
+    public function Operations() {
         return $this->hasMany("App\\Models\\Operation", "class_id");
     }
 }

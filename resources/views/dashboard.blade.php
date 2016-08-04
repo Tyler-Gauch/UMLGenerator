@@ -28,6 +28,13 @@
       			Project Settings<span class="hot_key pull-right"></span>
       		</a>
       	</li>
+      	@if(isset($branches))
+      		<li>
+	      		<a href="#" id="force_github_load" class="clear-fix">
+	      			Reload From Github<span class="hot_key pull-right"></span>
+	      		</a>
+      		</li>
+      	@endif
       </ul>
     </li>
 	<li class="dropdown">
@@ -75,6 +82,8 @@
 					@else
 						<legend id="project_name" style="font-size: 24px; text-align: left; background-color: #ccc" data-project="{{$project->name}}">{{$project->name}}</legend>
 					@endif
+
+					<input type="hidden" id="current_branch" value="null"/>
 				@endif
 				<div class="col-lg-12">
 				</div>
@@ -269,21 +278,7 @@
 		        			<input type="text" id="new_project_name" class="form-control" />
 	        			</div>		        		
 	        		</div>
-        			<!-- <div class="col-lg-12">
-		        		<div class="col-lg-4">
-			        		<label>Language</label>
-			        	</div>
-			        	<div class="col-lg-8">
-			        		<select id="new_project_language" class="form-control">
-			        			<option value="null">Please Select a Language</option>
-			        			<option value="java">JAVA</option>
-			        			<option value="php" disabled>PHP-Coming Soon</option>
-			        		</select>
-			        	</div>
-			        </div> -->
-			        </div>
 		        </div>
-
 	      	</div>
 	      	<div class="row hidden" id="new_git_project">
 		        <div class="col-lg-12">
@@ -398,8 +393,11 @@
 		var status = "select";
 		var holderObject = {};
 		var viewBoxDefault = 5000;
-		UMLClassSaveURL = "/";
 		var defaultMarker = "arrowFill";
+		@if(isset($project))
+		var projectName = "{{ $project->name }}";
+		UMLClassSaveURL = projectName+"/save";
+		@endif
 
 		//blade variables
 
@@ -427,6 +425,46 @@
 		{
 			$("#list_view_class_"+umlClassId).remove();
 		}
+
+		function addClass(obj = {}){
+			console.log("adding class", obj);
+			var umlclass = new UMLClass(obj);
+			addClassToListView(umlclass);
+			$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
+			$("#class_"+umlclass.id).mouseup();
+			$("#edit_classname").focus();
+			$("#edit_classname").select();
+			$("#select").click();
+			$("#edit_form").removeClass("hidden");
+			$("#list_view").addClass("hidden");
+			$("#edit_line_form").addClass("hidden");
+
+		}
+		@if(isset($project))
+			function loadProjectModels(branch = null, callback=function(){}){	
+				var postData = {};
+				if(branch != null)
+				{
+					postData["branch"] = branch;
+				}
+
+				$.ajax({
+					data: postData,
+					method: "POST",
+					url: "/"+projectName+"/load",
+					success: function(data){
+						if(data.success)
+						{
+							console.log(data);
+							$.each(data.model, function(key, umlClass){
+								addClass(umlClass);
+							});
+						}
+						callback(data.success);
+					}
+				});
+			}
+		@endif
 	</script>
 
 	<script src="/js/UMLClass.js"></script>
@@ -447,9 +485,12 @@
 				$("#"+$(this).data("target")).mouseup();
 			});
 
-
-			@if(isset($branches))
-				$("#edit_class_branch_list").find("a").click();
+			@if(isset($project))
+				@if(isset($branches))
+					$("#edit_class_branch_list").find("a").click();
+				@else
+					loadProjectModels();
+				@endif
 			@endif
 
 			$("#new_project_type").on("change", function(){

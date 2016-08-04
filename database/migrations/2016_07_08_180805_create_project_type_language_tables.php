@@ -17,6 +17,7 @@ class CreateProjectTypeLanguageTables extends Migration
         Schema::create("project_types", function(Blueprint $table){
             $table->increments('id')->unsigned();
             $table->string('name');
+            $table->timestamps();
         });
 
          // Insert "github" and "empty" project types
@@ -28,6 +29,7 @@ class CreateProjectTypeLanguageTables extends Migration
             $table->increments('id')->unsigned();
             $table->string('name');
             $table->boolean('enabled');
+            $table->timestamps();
         });
 
         // Insert Java and PHP into languages

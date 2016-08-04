@@ -76,6 +76,8 @@ $("#edit_classname").on("change", function(){
 	var c = UMLClasses[$("#edit_target").val()];
 	c.className = $("#edit_classname").val();
 	c.render(c.selected);
+
+	$("#list_view")
 });
 
 $("#edit_class_type").on("change", function(){
