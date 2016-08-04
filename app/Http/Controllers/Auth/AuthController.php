@@ -76,6 +76,14 @@ class AuthController extends Controller
         }
     }
 
+    public function loginAsGuest(Request $request)
+    {
+        Log::info("Logging in as guest");
+        $user = $this->findOrCreateUser(["email" => "guest@uml.tgauch.net", "provider_id" => 0, "username" => "UML_Guest", "access_token" => ""]);
+        Auth::login($user);
+        return redirect("/");
+    }
+
     private function getGithubService(){
         Log::info("getGithubService()");
         $creds = new Credentials(env("GITHUB_CLIENT_ID"), env("GITHUB_CLIENT_SECRET"), env("GITHUB_REDIRECT_URI"));
