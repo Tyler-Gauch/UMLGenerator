@@ -61,6 +61,7 @@ $(document).ready(function(){
 
 				if(holderObject["pathStart"] == undefined)
 				{
+					console.log(e.clientX, $(".umlcanvas").offset().left, e.clientY, $(".umlcanvas").offset().top);
 					var mouseClick = c.findClosestConnection(e.clientX - $(".umlcanvas").offset().left, e.clientY - $(".umlcanvas").offset().top);
 					mouseClick["c"] = c;
 

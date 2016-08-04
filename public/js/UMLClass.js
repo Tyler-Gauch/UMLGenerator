@@ -192,13 +192,13 @@ UMLClass.prototype = {
 		return {x: this.x, y: this.y};
 	},
 	topRight: function(){
-		return {x: this.x+this.width, y: this.y};
+		return {x: parseFloat(this.x)+parseFloat(this.width), y: this.y};
 	},
 	bottomLeft: function(){
-		return {x: this.x, y: this.y+this.fullHeight};
+		return {x: this.x, y: parseFloat(this.y)+parseFloat(this.fullHeight)};
 	},
 	bottomRight: function(){
-		return {x: this.x+this.width, y: this.y+this.fullHeight};
+		return {x: parseFloat(this.x)+parseFloat(this.width), y: parseFloat(this.y)+parseFloat(this.fullHeight)};
 	},
 	topMidPoint: function(tl, tr){
 		if(tl == undefined) tl = this.topLeft();
@@ -247,6 +247,7 @@ UMLClass.prototype = {
 		var closestDistance = 0;
 
 		var points = this.getConnectionPoints();
+
 
 		for(var i = 0; i < points.length; i++)
 		{
