@@ -290,6 +290,8 @@ UMLClass.prototype = {
 			return;
 		}
 
+		console.log("Adding relationship from " + this.className + " to " + className + " of type " + type);
+
 		var emp = this.midPoint();
 		var smp = umlClass.midPoint();
 		var startPoint = this.findClosestConnection(smp.x, smp.y);

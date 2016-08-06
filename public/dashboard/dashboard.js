@@ -66,8 +66,10 @@ $(document).ready(function(){
 					mouseClick["c"] = c;
 
 					holderObject["pathStart"] = mouseClick;
+
 				}else{
 					$("#line-temp").remove();
+					// Add the relationship to the "pathStart" class and the current class
 					holderObject["pathStart"]["c"].addRelationship(c.className, "references");
 
 					delete holderObject["pathStart"];

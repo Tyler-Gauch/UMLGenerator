@@ -492,6 +492,7 @@
 			if(!beSubtle){
 				window.showLoader("Please Wait.  Saving in Progess...");
 			}
+
 			UMLClassSaveAll(window.hideLoader());
 			needsSave = false;
 			if(beSubtle)
@@ -596,7 +597,7 @@
 				var endMarker = path.attr("marker-end");
 				var dashArray = path.attr("stroke-dasharray");
 
-				console.log(startMarker, endMarker, dashArray);
+				console.log("startMarker: " + startMarker + ", endMarker: " + endMarker + ", dashArray: " + dashArray);
 
 				if(startMarker == undefined)
 				{
@@ -631,6 +632,8 @@
 				}else{
 					$("#"+$("#edit_line_target").val()).attr("marker-start", "url(#"+$(this).val()+")");
 				}
+
+				console.log("marker-start change: " + $("#"+$("#edit_line_target").val()).attr("marker-start"));
 			});
 
 			$("#edit_line_type").on("change", function(){
@@ -640,6 +643,8 @@
 				}else{
 					$("#"+$("#edit_line_target").val()).attr("stroke-dasharray", "5,5");
 				}
+
+				console.log("stroke change: " + $("#"+$("#edit_line_target").val()).attr("stroke-dasharray"));
 			});
 
 			$("#edit_line_end").on("change", function(){
@@ -649,6 +654,8 @@
 				}else{
 					$("#"+$("#edit_line_target").val()).attr("marker-end", "url(#"+$(this).val()+")");
 				}
+
+				console.log("marker-end change: " + $("#"+$("#edit_line_target").val()).attr("marker-end"));
 			});
 
 		});
