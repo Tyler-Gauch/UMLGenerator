@@ -170,7 +170,7 @@ class ProjectController extends Controller
                   $attribute->is_static   = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
                   $attribute->is_final    = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
                   $attribute->is_abstract = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
-                  $attributes->default_value = ( isset($attr["default"]) ? $attr["default"] : "");
+                  $attribute->default_value = ( isset($attr["default"]) ? $attr["default"] : "");
                   $attribute->updated_at  = $currentTime; 
                   
                   // TODO default value doesnt show up right, has a colon
