@@ -165,13 +165,14 @@ class ProjectController extends Controller
                   );
 
                   // Update the values
-                  $attribute->visibility  = $attr["visibility"];
-                  $attribute->type        = $attr["type"];
-                  $attribute->is_static   = $attr["isStatic"];
-                  $attribute->is_final    = $attr["isFinal"];
-                  $attribute->is_abstract = $attr["isAbstract"];
+                  $attribute->visibility  = ( isset($attr["visibility"]) ? $attr["visibility"] : "public");
+                  $attribute->type = ( isset($attr["type"]) ? $attr["type"] : ""); //constructors have no type
+                  $attribute->is_static   = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
+                  $attribute->is_final    = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
+                  $attribute->is_abstract = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
+                  $attributes->default_value = ( isset($attr["default"]) ? $attr["default"] : "");
                   $attribute->updated_at  = $currentTime; 
-
+                  
                   // TODO default value doesnt show up right, has a colon
 
                   $attribute->save();
