@@ -2,22 +2,69 @@ var UMLClassID = 0;
 var UMLClassX = 10;
 var UMLClassY = 10;
 
+
 var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 	
 	var postData = {};
+	var changedItems = {};
+	var deletedItems = {};
 	var k  = 0;
 
 	$.each(UMLClasses, function(key, value){
-		postData[k++] = value.serialize(); 
+		changedItems[k++] = value.serialize(); 
 	});
 
-	console.log(postData);
+	postData["savedItems"] = JSON.stringify(changedItems);
+
+	if(holderObject["deletedClasses"] != undefined)
+	{
+		k = 0;
+		$.each(holderObject["deletedClasses"], function(key, value){
+			deletedItems[k++] = value.className; //only need the class name to delete it 
+		});
+
+		postData["deletedClasses"] = JSON.stringify(changedItems);
+	}
+
 
 	$.ajax({
 		url: UMLClassSaveURL+"/"+$("#current_branch").val(), //declared global in dashboard.blade.php 
 		method: "POST",
-		data: JSON.stringify(postData),
-		content: "application/json",
+		data: {savedItems: JSON.stringify(postData)},
+		success: successCB,
+		fail: failCB
+	});
+}
+
+var UMLClassSaveChanged = function(successCB = function(){}, failCB = function(){}){
+	var postData = {};
+	var changedItems = {};
+	var deletedItems = {};
+	var k  = 0;
+
+	if(holderObject["editedClasses"] != undefined){
+		
+		$.each(holderObject["editedClasses"], function(key, value){
+			changedItems[k++] = value.serialize(); 
+		});
+
+		postData["savedItems"] = JSON.stringify(changedItems);
+	}
+
+	if(holderObject["deletedClasses"] != undefined)
+	{
+		k = 0;
+		$.each(holderObject["deletedClasses"], function(key, value){
+			deletedItems[k++] = value.className; //only need the class name to delete it 
+		});
+
+		postData["deletedClasses"] = JSON.stringify(deletedItems);
+	}
+
+	$.ajax({
+		url: UMLClassSaveURL+"/"+$("#current_branch").val(), //declared global in dashboard.blade.php 
+		method: "POST",
+		data: postData,
 		success: successCB,
 		fail: failCB
 	});

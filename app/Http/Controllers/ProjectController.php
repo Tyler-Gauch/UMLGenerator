@@ -125,9 +125,11 @@ class ProjectController extends Controller
             ]
          );
 
-         $data = $request->all();
+         $savedItems = $request->input("savedItems", "{}");
+
+         $savedItems = \json_decode($savedItems, true);
          // Loop through classes from user input
-         foreach ($data as $curObj) {
+         foreach ($savedItems as $curObj) {
             Log::info("Processing Class: {$curObj['className']}");
             $className  = $curObj["className"];
             $locX       = $curObj["x"];  // starting x coordinate of the class 
@@ -216,20 +218,26 @@ class ProjectController extends Controller
                // Now all functions saved from the user have been updated. Remove any old functions of the current class
                Operation::where("class_id", "=", $curClass->id)->where("updated_at", "<", $currentTime)->delete();
             }
-
-
-
          }
 
          // Now all classes saved from the user have been updated. Remove any old classes of the current model
-         $oldClasses = ClassObj::where("model_id", "=", $model->id)->where("updated_at", "<", $currentTime)->get();
+         $deletedClasses = $request->input("deletedClasses", "{}");
+         $deletedClasses = \json_decode($deletedClasses, true);
+
          
-         foreach ($oldClasses as $oldClass) {
+         foreach ($deletedClasses as $oldClass) {
+            echo "Processing Class: $oldClass\n"; 
+            $curClass = ClassObj::where("name", "=", $oldClass)->where("model_id", "=", $model->id)->first();
+            if($curClass == null)
+            {
+               echo "\tClass Not Found";
+               continue;
+            }
 
             // Ensure the children are removed
-            $oldClass->Attributes()->delete();
-            $oldClass->Operations()->delete();
-            $oldClass->delete();
+            $curClass->Attributes()->delete();
+            $curClass->Operations()->delete();
+            $curClass->delete();
          }
       }
 
