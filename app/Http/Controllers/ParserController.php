@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use App\Helpers\ParserHelper;
 use App\Helpers\GitHubHelper;
 use Auth;
+use App\Models\Project;
 
 class ParserController extends Controller{
 
@@ -32,9 +33,31 @@ class ParserController extends Controller{
 
 	}
 
-	public function parseBranch(Request $request, $repo, $branch){
-		$github = new GitHubHelper(Auth::user());
-		$filename = $github->getArchive($repo, $branch);
+	public function parseBranch(Request $request, $project, $branch){
+		$project = Project::where("name", "=", $project)->firstOrFail();
+
+		if($project->repo != null)
+		{
+			$github = new GitHubHelper(Auth::user());
+			$filename = $github->getArchive($project->repo, $branch);
+
+			if($filename == null)
+			{
+				return response()->json(["success" => false, "message" => "Error downloading repo.  Please try again."]);
+			}
+		}else if($project->url != null)
+		{
+			$result = GitHubHelper::downloadPublicRepo($project->url, $branch);
+
+			if(!$result["success"])
+			{
+				return response()->json(["success" => false, "message" => $result["message"]]);
+			}
+			$filename = $result["filename"];
+		}else{
+			return response()->json(["success" => false, "message" => "Data error! Please Contact Support"]);
+		}
+
 		$zip = new \ZipArchive;
 
 		if(true === $zip->open($filename.".zip")){
@@ -47,7 +70,5 @@ class ParserController extends Controller{
 		}
 
 		return response()->json(["success" => false, "message" => "Unkown error occurred"]);
-
 	}
-
 }

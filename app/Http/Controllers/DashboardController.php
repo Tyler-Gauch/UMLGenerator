@@ -32,8 +32,8 @@ class DashboardController extends Controller
 
             // Get the github branches only if the project is of type github
             if ($type->name != "empty") {
-               $github = new GitHubHelper(Auth::user());
-               $data["branches"] = $github->listBranches($project);
+                  $github = new GitHubHelper(Auth::user());
+                  $data["branches"] = $github->listProjectBranches($data["project"]);
            }
    		}
    		return response()->view("dashboard", $data);

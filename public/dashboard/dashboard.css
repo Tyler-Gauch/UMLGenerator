@@ -147,3 +147,10 @@
 	width: 100px;
 	height: 100px;
 }
+
+#project_name{
+	font-size: 24px; 
+	text-align:left; 
+	background-color:#ccc; 
+	overflow: hidden;
+}

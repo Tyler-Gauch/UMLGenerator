@@ -16,18 +16,18 @@ use App\Models\Attribute;
 use App\Models\Operation;
 use Carbon\Carbon;
 use Log;
+use App\Helpers\ProjectHelper;
 
 class ProjectController extends Controller
 {
    	public function create(Request $request)
    	{
-         $name = $request->input("name", null);
-         $language = $request->input("language", "None");
          $type = $request->input("type", null);
          $name = null;
          $language = "java";
          $url = null;
          $project_type_id = null;
+         $repo = null;
 
          if($type == "empty")
          {
@@ -40,18 +40,41 @@ class ProjectController extends Controller
 
          }else if($type == "github")
          {          
+            $url = $request->input("url", null);
             $name = $request->input("repoName", null);
             $language = $request->input("language", null);
 
-            if($name == null || $name == "null" || $name == "")
+            if($url != null && $url != "null" && $url != "")
             {
-               return response()->json(["success" => false, "message" => "You must choose a Repository"]);
+               $branch = $request->input("branch", "master");
+               $result = GitHubHelper::downloadPublicRepo($url, $branch);
+
+               if(!$result["success"])
+               {
+                  return response()->json(["success" => false, "message" => $result["message"]]);
+               }
+               //if we got here url was right so we can extract the repo name to create the project
+               $name = str_replace("https://github.com/", "", $url);
+               $name = str_replace("/", "-", $name);
+            }else{
+               $repo = $name;
             }
 
+            if($name == null || $name == "null" || $name == "")
+            {
+               if(Auth::user()->hasRole("GUEST"))
+               {
+                  return response()->json(["success" => false, "message" => "You must enter a URL"]);   
+               }else{
+                  return response()->json(["success" => false, "message" => "You must choose a Repository or enter a URL"]);
+               }
+            }
+            
             if($language == null || $language == "null" || $language == "")
             {
                return response()->json(["success" => false, "message" => "You must choose a Language"]);
             }
+
          }
 
          if($type != "empty" && ($language == null || $language == "null" || $language == ""))
@@ -59,14 +82,18 @@ class ProjectController extends Controller
             return response()->json(["success" => false, "message" => "You must choose a Project Type"]);
          }
 
+         Log::info("$name, $repo, $language, $url");
+
          $project = Project::where("name", $name)->where("user_id", Auth::user()->id)->firstOrCreate([
             "name" => $name,
+            "repo" => $repo,
             "language_id" => Language::where("name", "=", $language)->first()->id,
             "user_id" => Auth::user()->id,
-            "project_type_id" => ProjectType::where("name", "=", $type)->first()->id
+            "project_type_id" => ProjectType::where("name", "=", $type)->first()->id,
+            "url" => $url
          ]);
 
-   		return response()->json(["success" => true]);
+   		return response()->json(["success" => true, "projectName" => $name]);
    	}
 
       public function get(Request $request, $project = null){
@@ -83,7 +110,7 @@ class ProjectController extends Controller
       }
 
       public function save(Request $request, $project, $branch = null) {
-
+         
          // Get the current timestamp which will be used for removing old attributes, functions, and classes later on
          $currentTime = Carbon::now()->toDateTimeString();
          
@@ -98,8 +125,8 @@ class ProjectController extends Controller
             ]
          );
 
-         // Loop through classes from user input
          $data = $request->all();
+         // Loop through classes from user input
          foreach ($data as $curObj) {
             $className  = $curObj["className"];
             $locX       = $curObj["x"];  // starting x coordinate of the class 

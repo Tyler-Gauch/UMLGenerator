@@ -35,7 +35,7 @@
       	@if(isset($branches))
       		<li>
 	      		<a href="#" id="force_github_load" class="clear-fix">
-	      			Reload From Github<span class="hot_key pull-right"></span>
+	      			Reload From GitHub<span class="hot_key pull-right"></span>
 	      		</a>
       		</li>
       	@endif
@@ -75,7 +75,7 @@
 				@if(isset($project))
 					@if(isset($branches))
 						<div class="dropdown">
-						  	<button class="btn btn-block dropdown-toggle" type="button" id="project_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="font-size: 24px; text-align:left; background-color:#ccc" data-project="{{$project->name}}">
+						  	<button class="btn btn-block dropdown-toggle" type="button" id="project_name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-project="{{$project->name}}">
 						    {{$project->name}}
 						    	<span class="fa fa-chevron-circle-down"></span>
 						  	</button>
@@ -86,7 +86,7 @@
 							</ul>
 						</div>
 					@else
-						<legend id="project_name" style="font-size: 24px; text-align: left; background-color: #ccc" data-project="{{$project->name}}">{{$project->name}}</legend>
+						<legend id="project_name"  data-project="{{$project->name}}">{{$project->name}}</legend>
 					@endif
 
 					<input type="hidden" id="current_branch" value="null"/>
@@ -275,7 +275,7 @@
 	      					<select id="new_project_type" class="form-control allow-hotkeys">
 	      						<option value="null">Please Choose a Project Type</option>
 	      						<option value="empty">Empty Project</option>
-	      						<option value="github">Github Project</option>
+	      						<option value="github">GitHub Project</option>
 	      					</select>
 	      				</div>
 	      			</div>
@@ -317,7 +317,10 @@
 				        			</div>
 			        			@endif
 		        				<div class="col-lg-12">
-			        				<input type="text" id="new_project_url" class="form-control allow-hotkeys" placeholder="Public Github URL" />
+			        				<input type="text" id="new_project_url" class="form-control allow-hotkeys" placeholder="Public GitHub URL" />
+		        				</div>
+		        				<div class="col-lg-12">
+		        					<input type="text" id="new_project_branch" class="form-control allow-hotkeys" placeholder="Public GitHub URL Branch"/>
 		        				</div>
 		        			</div>
 		        		</div>		        		
@@ -470,6 +473,7 @@
 		@if(isset($project))
 		var projectName = "{{ $project->name }}";
 		UMLClassSaveURL = projectName+"/save";
+		var loadFromUrl = @if($project->url == null) false; @else true; @endif;
 		@else
 			$("#initial_prompt").modal("show");
 		@endif

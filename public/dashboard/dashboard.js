@@ -187,6 +187,7 @@ $(document).ready(function(){
 
 		var type = $("#new_project_type").val();
 		var url = $("#new_project_url").val();
+		var branch = $("#new_project_branch").val();
 		var projectName = $("#new_project_name").val();
 		var id = $("#new_project_repo").val();
 		var language = $("#new_project_language").val();
@@ -201,12 +202,13 @@ $(document).ready(function(){
 			postData["projectName"] = projectName;
 			postData["language"] 	= "None";
 		}else if(type == "github"){
+			postData["language"] = language;
 			if(repoName != "null")
 			{
 				postData["repoName"] = repoName;
-				postData["language"] = language;
 			}else{
-				postData["repoUrl"]  = url;
+				postData["url"]  = url;
+				postData["branch"] = branch;
 			}
 		}
 
@@ -219,9 +221,9 @@ $(document).ready(function(){
 				{
 					if(type == "empty")
 					{
-						window.location = "/"+projectName;
+						window.location = "/"+data.projectName;
 					}else{
-						window.location = "/"+repoName;
+						window.location = "/"+data.projectName;
 					}
 				}else{
 					alert("Error:"+data.message);
