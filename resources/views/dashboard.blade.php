@@ -19,16 +19,18 @@
       			Open Project <span class="hot_key pull-right">CTRL+O</span>
       		</a>
       	</li>
-      	<li>
-      		<a href="#" id="save_project" class="clear-fix">
-      			Save <span class="hot_key pull-right">CTRL+S</span>
-      		</a>
-      	</li>
-      	<li>
-      		<a href="#" id="open_project_settings" class="clear-fix">
-      			Project Settings<span class="hot_key pull-right"></span>
-      		</a>
-      	</li>
+	      	@if(isset($project))
+	      	<li>
+	      		<a href="#" id="save_project" class="clear-fix">
+	      			Save <span class="hot_key pull-right">CTRL+S</span>
+	      		</a>
+	      	</li>
+	      	<li>
+	      		<a href="#" id="open_project_settings" class="clear-fix">
+	      			Project Settings<span class="hot_key pull-right"></span>
+	      		</a>
+	      	</li>
+	      	@endif
       	@endif
       	@if(isset($branches))
       		<li>
@@ -39,6 +41,7 @@
       	@endif
       </ul>
     </li>
+    @if(isset($project))
 	<li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Edit<span class="caret"></span></a>
       <ul class="dropdown-menu dropdown-menu-large">
@@ -62,7 +65,7 @@
     <button id="select" class="btn btn-primary btn-toolbar btn-warning navbar-btn" type="button"><i class="fa fa-mouse-pointer"></i></button>
     <button id="draw_line" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows-h"></i></button>
     <button id="scale" class="btn btn-primary btn-toolbar navbar-btn"><i class="fa fa-arrows"></i></button>
-
+    @endif
 @endsection
 
 @section("content")
@@ -193,7 +196,7 @@
 						<div class="row" style="padding-top: 10px">
 							<div class="col-lg-12">
 								<div class="input-group">
-									<input type="text" id="edit_attributes_add" class="form-control allow-hotkeys"/>
+									<input type="text" id="edit_attributes_add" class="form-control allow-hotkeys" placeholder="New Attribute Name"/>
 									<span class="input-group-btn">
 										<button class="btn btn-primary" id="edit_attributes_add_btn">+</button>
 									</span>
@@ -212,7 +215,7 @@
 						<div class="row" style="padding-top: 10px">
 							<div class="col-lg-12">
 								<div class="input-group">
-									<input type="text" id="edit_functions_add" class="form-control allow-hotkeys"/>
+									<input type="text" id="edit_functions_add" class="form-control allow-hotkeys" placeholder="New Function Name"/>
 									<span class="input-group-btn">
 										<button class="btn btn-primary" id="edit_functions_add_btn">+</button>
 									</span>
@@ -224,6 +227,7 @@
 				<input type="hidden" value="null" id="edit_target"/>
 			</div>
 		</div>
+		@if(isset($project))
 		<div class="col-lg-10">
 			<div class="row parent-container" id="parent">
 				<svg class="umlcanvas" preserveAspectRatio="xMinYMin meet" viewBox="0 0 5000 5000">
@@ -244,13 +248,20 @@
 				</svg>
 			</div>
 		</div>
+		@endif
 	</div>
 
-	<div class="modal fade" tabindex="-1" role="dialog" id="new_project_modal">
+	<div class="modal fade" tabindex="-1" role="dialog" id="new_project_modal"
+		@if(!isset($project))
+			 data-backdrop="static" data-keyboard="false" 
+		@endif
+	>
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	      	@if(isset($project))
+	        	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        @endif
 	        <h4 class="modal-title">New Project</h4>
 	      </div>
 	      <div class="modal-body">
@@ -327,18 +338,28 @@
 	        </div>
 	      </div>
 	      <div class="modal-footer">
+	        @if(isset($project))
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	       @else
+	       	<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#initial_prompt">Back</button>
+	       @endif
 	        <button type="button" class="btn btn-primary hidden" id="new_project_create">Create Project</button>
 	      </div>
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
-	<div class="modal fade" tabindex="-1" role="dialog" id="open_project_modal">
+	<div class="modal fade" tabindex="-1" role="dialog" id="open_project_modal"
+		@if(!isset($project))
+			 data-backdrop="static" data-keyboard="false" 
+		@endif
+	>
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	      	@if(isset($project))
+	        	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        @endif
 	        <h4 class="modal-title">Open Project</h4>
 	      </div>
 	      <div class="modal-body">
@@ -357,7 +378,11 @@
 	        </div>
 	      </div>
 	      <div class="modal-footer">
+	        @if(isset($project))
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	       @else
+	       	<button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#initial_prompt">Back</button>
+	       @endif
 	        <button type="button" class="btn btn-primary" id="open_project_button">Open Project</button>
 	      </div>
 	    </div><!-- /.modal-content -->
@@ -393,6 +418,37 @@
 	  </div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 
+	<div class="modal fade" tabindex="-1" role="dialog" id="initial_prompt" data-backdrop="static" data-keyboard="false" >
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">What would you like to do?</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+	      		<div class="col-lg-offset-3 col-lg-3">
+			        <div class="row">
+		        		<button class="btn btn-prompt btn-default new_project" data-dismiss="modal"><span style="font-size: 64px" class="fa fa-file-text-o"></span></button>
+		        	</div>
+			        <div class="row">
+		        		<strong>New Project</strong>
+		        	</div>
+		        </div>
+		        <div class="col-lg-6">	
+			        <div class="row">
+			        	<button class="btn btn-prompt btn-default open_project" data-dismiss="modal"><span class="fa fa-folder-open-o" style="font-size: 64px"></span></button>
+			        </div>
+			        <div class="row">
+	    	    		<strong>Open Project</strong>
+	    	    	</div>
+		        </div>
+	        </div>
+	        	
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
 	<div id="subtle_save_gear">
 	 	<img src="gears.gif"/>Saving...
 	</div>
@@ -414,6 +470,8 @@
 		@if(isset($project))
 		var projectName = "{{ $project->name }}";
 		UMLClassSaveURL = projectName+"/save";
+		@else
+			$("#initial_prompt").modal("show");
 		@endif
 
 		var userIsGuest = @if(Auth::user()->hasRole("GUEST")) true @else false @endif

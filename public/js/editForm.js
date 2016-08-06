@@ -54,7 +54,7 @@ function deleteClass(){
 			$(this).remove();
 		});
 		delete UMLClasses[$("#edit_target").val()];
-		$("#class_"+c.id+"_parent").remove();
+		c.destroy();
 		removeClassFromListView(c.id);
 		clearEditForm();
 	}
@@ -77,7 +77,7 @@ $("#edit_classname").on("change", function(){
 	c.className = $("#edit_classname").val();
 	c.render(c.selected);
 
-	$("#list_view_class_"+c.id).text("<strong>"+c.className+"</strong>");
+	$("#list_view_class_"+c.id).html("<strong>"+c.className+"</strong>");
 	setClassEdited(c);
 });
 
@@ -218,11 +218,11 @@ $(document).on("change", ".edit_attributes_vis", function(){
 
 function appendEditAttribute(key, umlClass){
 	var id = umlClass.id+'_'+key;
-	var html = '<div class="col-lg-12" id="edit_attributes_'+id+'">'+
+	var html = '<div class="col-lg-12" style="padding-bottom: 5px" id="edit_attributes_'+id+'">'+
 					'<div class="input-group">'+
 						'<input type="text" class="edit_attributes form-control" data-key="'+key+'" value="'+umlClass.attributes[key].name+'"/>'+
 						'<span class="input-group-btn">'+
-							'<button class="btn btn-success edit_expand" data-target="edit_attributes_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
+							'<button class="btn btn-success edit_expand" data-target="edit_attributes_expand_content_'+id+'"><span class="fa fa-arrow-circle-down" style="font: normal normal normal 14px/1.5 FontAwesome;"></span></button>'+
 						'</span>'+
 					'</div>'+
 					'<div class="col-lg-12" id="edit_attributes_expand_content_'+id+'" style="background-color: #ccc; display:none">'+
@@ -430,11 +430,11 @@ $(document).on("change", ".edit_functions_params", function(){
 
 function appendEditFunction(key, umlClass){
 	var id = umlClass.name+"_"+key;
-	var html = '<div class="col-lg-12" id="edit_functions_'+id+'">'+
+	var html = '<div class="col-lg-12" style="padding-bottom: 5px" id="edit_functions_'+id+'">'+
 					'<div class="input-group">'+
 						'<input type="text" class="edit_functions form-control" data-key="'+key+'" value="'+umlClass.functions[key].name+'"/>'+
 						'<span class="input-group-btn">'+
-							'<button class="btn btn-success edit_expand" data-target="edit_functions_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
+							'<button class="btn btn-success edit_expand" data-target="edit_functions_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"  style="font: normal normal normal 14px/1.5 FontAwesome;"></span></button>'+
 						'</span>'+
 					'</div>'+
 					'<div class="col-lg-12" id="edit_functions_expand_content_'+id+'" style="background-color: #ccc; display:none">'+

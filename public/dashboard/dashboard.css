@@ -141,3 +141,9 @@
 #subtle_save_gear img{
 	width: 100%;
 }
+
+.btn-prompt{
+	text-align: center;
+	width: 100px;
+	height: 100px;
+}

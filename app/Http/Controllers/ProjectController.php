@@ -198,8 +198,8 @@ class ProjectController extends Controller
          foreach ($oldClasses as $oldClass) {
 
             // Ensure the children are removed
-            $oldClass->Attribute()->delete();
-            $oldClass->Operation()->delete();
+            $oldClass->Attributes()->delete();
+            $oldClass->Operations()->delete();
             $oldClass->delete();
          }
       }
