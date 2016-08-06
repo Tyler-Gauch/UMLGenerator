@@ -205,7 +205,7 @@ class ProjectController extends Controller
                   $operation->is_final    = ( isset($func["isFinal"]) ? $func["isFinal"] : false);
                   $operation->is_abstract = ( isset($func["isAbstract"]) ? $func["isAbstract"] : false);
                   $operation->parameters  = ( isset($func["parameters"]) ? $func["parameters"] : "()");
-                  // $operation->updated_at  = $currentTime; //not needed this is auto handled by the ->save() function
+                  $operation->updated_at  = $currentTime;
 
                   $operation->save();
 
@@ -282,7 +282,7 @@ class ProjectController extends Controller
                $a["isStatic"] = $attribute->is_static;
                $a["isFinal"] = $attribute->is_final;
                $a["isabstract"] = $attribute->is_abstract;
-               $c["attribtues"][] = $a;
+               $c["attributes"][] = $a;
 
             }
             foreach($class->Operations()->get() as $operation)
