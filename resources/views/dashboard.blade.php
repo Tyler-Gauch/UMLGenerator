@@ -486,7 +486,7 @@
 
 		window.midpoint = function(x1, y1, x2, y2)
 		{
-			return {x: (x1+x2)/2, y: (y1+y2)/2}
+			return {x: (parseFloat(x1)+parseFloat(x2))/2, y: (parseFloat(y1)+parseFloat(y2))/2};
 		}
 
 		function addClassToListView(umlClass){
