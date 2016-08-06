@@ -16,7 +16,8 @@ var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 	$.ajax({
 		url: UMLClassSaveURL+"/"+$("#current_branch").val(), //declared global in dashboard.blade.php 
 		method: "POST",
-		data: postData,
+		data: JSON.stringify(postData),
+		content: "application/json",
 		success: successCB,
 		fail: failCB
 	});
