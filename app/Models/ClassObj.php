@@ -4,8 +4,8 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use App\Attribute;
-use App\Operation;
+use App\Models\Attribute;
+use App\Models\Operation;
 
 class ClassObj extends Model
 {

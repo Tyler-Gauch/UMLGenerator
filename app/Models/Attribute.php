@@ -4,7 +4,7 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use App\ClassObj;
+use App\Models\ClassObj;
 
 class Attribute extends Model
 {
