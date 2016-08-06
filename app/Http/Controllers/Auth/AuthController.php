@@ -39,7 +39,7 @@ class AuthController extends Controller
     protected $redirectTo = '/';
 
     public function login(){
-        Log::info("In login page");
+        Auth::logout();
         $githubService = $this->getGithubService();
         $url = $githubService->getAuthorizationUri();
         return response()->view("auth.login", ["github"=>$url]);
@@ -64,6 +64,7 @@ class AuthController extends Controller
             $user = $this->findOrCreateUser($result);
 
             $user->access_token = $token->getAccessToken();
+            $user->addRole("USER");
             $user->save();
 
             Log::info("Logging in user");
@@ -79,7 +80,9 @@ class AuthController extends Controller
     public function loginAsGuest(Request $request)
     {
         Log::info("Logging in as guest");
-        $user = $this->findOrCreateUser(["email" => "guest@uml.tgauch.net", "provider_id" => 0, "username" => "UML_Guest", "access_token" => ""]);
+        $user = $this->findOrCreateUser(["email" => "guest@uml.tgauch.net", "id" => 0, "username" => "UML_Guest", "access_token" => ""]);
+        $user->addRole("GUEST");
+        $user->save();
         Auth::login($user);
         return redirect("/");
     }
@@ -100,7 +103,7 @@ class AuthController extends Controller
                 "email" => $user["email"],
                 "provider_id" => $user["id"],
                 "username" => $user["login"],
-                "access_token" => $user["token"]->getAccessToken()
+                "access_token" => "",
             ]);
         }
     }

@@ -54,7 +54,7 @@ function deleteClass(){
 			$(this).remove();
 		});
 		delete UMLClasses[$("#edit_target").val()];
-		$("#class_"+c.id+"_parent").remove();
+		c.destroy();
 		removeClassFromListView(c.id);
 		clearEditForm();
 	}
@@ -77,17 +77,15 @@ $("#edit_classname").on("change", function(){
 	c.className = $("#edit_classname").val();
 	c.render(c.selected);
 
-	$("#list_view_class_"+c.id).text("<strong>"+c.className+"</strong>");
-	needsSave = true;
-	lastAction = new Date().getTime();
+	$("#list_view_class_"+c.id).html("<strong>"+c.className+"</strong>");
+	setClassEdited(c);
 });
 
 $("#edit_class_type").on("change", function(){
 	var c = UMLClasses[$("#edit_target").val()];
 	c.classType = $(this).val();
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 //////////////////////////////////////////////////////
@@ -100,8 +98,7 @@ $(document).on("change", ".edit_attribute", function(){
 	var c = UMLClasses[$("#edit_target").val()];
 	c.attributes[$(this).data("key")].name = $(this).val();
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("click", ".edit_attribute_del", function(){
@@ -122,8 +119,7 @@ $(document).on("click", ".edit_attribute_del", function(){
 	});
 	$("#"+$(this).data("target")).remove();
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $("#edit_attributes_add_btn").on("click", function(){
@@ -138,8 +134,7 @@ $("#edit_attributes_add_btn").on("click", function(){
 	$("#edit_attributes_add").val("");
 	appendEditAttribute(key, c);
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $("#edit_attributes_add").on("keyup", function(e){
@@ -162,8 +157,7 @@ $(document).on("change", ".edit_attributes_value", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_attributes_type", function(){
@@ -179,8 +173,7 @@ $(document).on("change", ".edit_attributes_type", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_attributes_static", function(){
@@ -196,8 +189,7 @@ $(document).on("change", ".edit_attributes_static", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_attributes_final", function(){
@@ -212,8 +204,7 @@ $(document).on("change", ".edit_attributes_final", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_attributes_vis", function(){
@@ -222,17 +213,16 @@ $(document).on("change", ".edit_attributes_vis", function(){
 	var attr = c.attributes[$(this).data("key")];
 	attr.visibility = val;
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 function appendEditAttribute(key, umlClass){
 	var id = umlClass.id+'_'+key;
-	var html = '<div class="col-lg-12" id="edit_attributes_'+id+'">'+
+	var html = '<div class="col-lg-12" style="padding-bottom: 5px" id="edit_attributes_'+id+'">'+
 					'<div class="input-group">'+
 						'<input type="text" class="edit_attributes form-control" data-key="'+key+'" value="'+umlClass.attributes[key].name+'"/>'+
 						'<span class="input-group-btn">'+
-							'<button class="btn btn-success edit_expand" data-target="edit_attributes_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
+							'<button class="btn btn-success edit_expand" data-target="edit_attributes_expand_content_'+id+'"><span class="fa fa-arrow-circle-down" style="font: normal normal normal 14px/1.5 FontAwesome;"></span></button>'+
 						'</span>'+
 					'</div>'+
 					'<div class="col-lg-12" id="edit_attributes_expand_content_'+id+'" style="background-color: #ccc; display:none">'+
@@ -325,8 +315,7 @@ $(document).on("change", ".edit_function", function(){
 	var c = UMLClasses[$("#edit_target").val()];
 	c.functions[$(this).data("key")].name = $(this).val();
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("click", ".edit_function_del", function(){
@@ -348,8 +337,7 @@ $(document).on("click", ".edit_function_del", function(){
 
 	$("#"+$(this).data("target")).remove();
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $("#edit_functions_add_btn").on("click", function(){
@@ -364,8 +352,7 @@ $("#edit_functions_add_btn").on("click", function(){
 	$("#edit_functions_add").val("");
 	appendEditFunction(key, c);
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 	
 });
 
@@ -389,8 +376,7 @@ $(document).on("change", ".edit_functions_type", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_functions_static", function(){
@@ -406,8 +392,7 @@ $(document).on("change", ".edit_functions_static", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_functions_final", function(){
@@ -422,8 +407,7 @@ $(document).on("change", ".edit_functions_final", function(){
 	}
 
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_functions_vis", function(){
@@ -432,8 +416,7 @@ $(document).on("change", ".edit_functions_vis", function(){
 	var attr = c.functions[$(this).data("key")];
 	attr.visibility = val;
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 $(document).on("change", ".edit_functions_params", function(){
@@ -442,17 +425,16 @@ $(document).on("change", ".edit_functions_params", function(){
 	var attr = c.functions[$(this).data("key")];
 	attr.parameters = val;
 	c.render(c.selected);
-	needsSave = true;
-	lastAction = new Date().getTime();
+	setClassEdited(c);
 });
 
 function appendEditFunction(key, umlClass){
 	var id = umlClass.name+"_"+key;
-	var html = '<div class="col-lg-12" id="edit_functions_'+id+'">'+
+	var html = '<div class="col-lg-12" style="padding-bottom: 5px" id="edit_functions_'+id+'">'+
 					'<div class="input-group">'+
 						'<input type="text" class="edit_functions form-control" data-key="'+key+'" value="'+umlClass.functions[key].name+'"/>'+
 						'<span class="input-group-btn">'+
-							'<button class="btn btn-success edit_expand" data-target="edit_functions_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"></span></button>'+
+							'<button class="btn btn-success edit_expand" data-target="edit_functions_expand_content_'+id+'"><span class="fa fa-arrow-circle-down"  style="font: normal normal normal 14px/1.5 FontAwesome;"></span></button>'+
 						'</span>'+
 					'</div>'+
 					'<div class="col-lg-12" id="edit_functions_expand_content_'+id+'" style="background-color: #ccc; display:none">'+
