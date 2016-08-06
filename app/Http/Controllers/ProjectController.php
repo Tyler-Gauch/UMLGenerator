@@ -128,7 +128,7 @@ class ProjectController extends Controller
          $data = $request->all();
          // Loop through classes from user input
          foreach ($data as $curObj) {
-            Log::info("Processing Class: {$data['className']}");
+            Log::info("Processing Class: {$curObj['className']}");
             $className  = $curObj["className"];
             $locX       = $curObj["x"];  // starting x coordinate of the class 
             $locY       = $curObj["y"];  // starting y coordinate of the class
