@@ -143,11 +143,11 @@ class ProjectController extends Controller
          // Loop through classes from user input
          foreach ($savedItems as $curObj) {
             Log::info("Processing Class: {$curObj['className']}");
-            $classId    = ( isset($curObj["dbId"]) ? $curObj["dbId"], null);
-            $className  = ( isset($curObj["className"]) ? $curObj["className"], null);
-            $locX       = ( isset($curObj["x"]) ? $curObj["x"], 0);  // starting x coordinate of the class 
-            $locY       = ( isset($curObj["y"]) ? $curObj["y"], 0);  // starting y coordinate of the class
-            $classType  = ( isset($curObj["type"]) ? $curObj["type"], "class");
+            $classId    = ( isset($curObj["dbId"]) ? $curObj["dbId"] : null);
+            $className  = ( isset($curObj["className"]) ? $curObj["className"] : null);
+            $locX       = ( isset($curObj["x"]) ? $curObj["x"] : 10);  // starting x coordinate of the class 
+            $locY       = ( isset($curObj["y"]) ? $curObj["y"] : 10);  // starting y coordinate of the class
+            $classType  = ( isset($curObj["type"]) ? $curObj["type"] : "class");
 
             // The class should have already been created. If there is no ID or it doesnt belong with the model, ignore it
             if ($classId == null || $className == null) {
