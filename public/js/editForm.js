@@ -55,6 +55,7 @@ function deleteClass(){
 		});
 		delete UMLClasses[$("#edit_target").val()];
 		c.destroy();
+		setClassDeleted(c);
 		removeClassFromListView(c.id);
 		clearEditForm();
 	}

@@ -244,6 +244,9 @@
 					    <marker id="arrowFill" markerWidth="12" markerHeight="12" refx="9" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
 					    	<path d="M0,0 L0,6 L9,3 z" class="marker"/>
 					    </marker>
+					    <marker id="arrowLine" markerWidth="12" markerHeight="12" refx="9" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
+					    	<path d="M0,6 L9,3 L0,0" class="marker"/>
+					    </marker>
 					  </defs>
 				</svg>
 			</div>
@@ -466,7 +469,7 @@
 		var status = "select";
 		var holderObject = {};
 		var viewBoxDefault = 5000;
-		var defaultMarker = "arrowFill";
+		var defaultMarker = "arrowLine";
 		var needsSave = false;
 		var lastAction = new Date().getTime();
 		var autoSaveTimeout = 2500; //inactivity for more than x milliseconds triggers an autosave
@@ -568,8 +571,9 @@
 				}else{
 					$("#subtle_save_gear").css("display", "block");
 				}
-				UMLClassSaveAll(window.hideLoader());
+				UMLClassSaveChanged(window.hideLoader());
 				delete holderObject["editedClasses"];
+				delete holderObject["deletedClasses"];
 				needsSave = false;
 				if(beSubtle)
 				{
@@ -596,6 +600,29 @@
 
 				if(!exists)
 					holderObject["editedClasses"].push(umlClass);
+				
+				needsSave = true;
+				lastAction = new Date().getTime();
+			@endif
+		}
+		function setClassDeleted(umlClass)
+		{
+			@if(Auth::user()->hasRole("USER"))
+				if(holderObject["deletedClasses"] == undefined)
+				{
+					holderObject["deletedClasses"] = [];	
+				}
+
+				var exists = false;
+				$.each(holderObject["deletedClasses"], function(key, value){
+					if(value.id == umlClass.id){
+						exists = true;
+						return;
+					}
+				});
+
+				if(!exists)
+					holderObject["deletedClasses"].push(umlClass);
 				
 				needsSave = true;
 				lastAction = new Date().getTime();

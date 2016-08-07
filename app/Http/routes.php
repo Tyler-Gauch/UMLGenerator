@@ -11,6 +11,10 @@
 |
 */
 
+Route::get("/info", function(){
+	phpinfo();
+});
+
 Route::group(["prefix" => "/auth"], function(){
 	Route::get("/", "Auth\\AuthController@login");
 	Route::get("/github", "Auth\\AuthController@loginWithGithub");	

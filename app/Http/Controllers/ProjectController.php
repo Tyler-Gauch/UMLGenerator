@@ -14,6 +14,9 @@ use App\Models\ModelObj;
 use App\Models\ClassObj;
 use App\Models\Attribute;
 use App\Models\Operation;
+use App\Models\Relationship;
+use App\Models\RelationshipLine;
+use App\Models\RelationshipMarker;
 use Carbon\Carbon;
 use Log;
 use App\Helpers\ProjectHelper;
@@ -125,9 +128,12 @@ class ProjectController extends Controller
             ]
          );
 
-         $data = $request->all();
+         $savedItems = $request->input("savedItems", "{}");
+
+         $savedItems = \json_decode($savedItems, true);
          // Loop through classes from user input
-         foreach ($data as $curObj) {
+         foreach ($savedItems as $curObj) {
+            Log::info("Processing Class: {$curObj['className']}");
             $className  = $curObj["className"];
             $locX       = $curObj["x"];  // starting x coordinate of the class 
             $locY       = $curObj["y"];  // starting y coordinate of the class
@@ -165,13 +171,14 @@ class ProjectController extends Controller
                   );
 
                   // Update the values
-                  $attribute->visibility  = $attr["visibility"];
-                  $attribute->type        = $attr["type"];
-                  $attribute->is_static   = $attr["isStatic"];
-                  $attribute->is_final    = $attr["isFinal"];
-                  $attribute->is_abstract = $attr["isAbstract"];
+                  $attribute->visibility  = ( isset($attr["visibility"]) ? $attr["visibility"] : "public");
+                  $attribute->type = ( isset($attr["type"]) ? $attr["type"] : ""); //constructors have no type
+                  $attribute->is_static   = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
+                  $attribute->is_final    = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
+                  $attribute->is_abstract = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
+                  $attribute->default_value = ( isset($attr["default"]) ? $attr["default"] : "");
                   $attribute->updated_at  = $currentTime; 
-
+                  
                   // TODO default value doesnt show up right, has a colon
 
                   $attribute->save();
@@ -215,19 +222,53 @@ class ProjectController extends Controller
                Operation::where("class_id", "=", $curClass->id)->where("updated_at", "<", $currentTime)->delete();
             }
 
+            // TODO - Change to match class ids
+            if (isset($curObj["relationships"])) {
+               foreach ($curObj["relationships"] as $relation) {
 
+                  // Get the line type
+                  $line = RelationshipLine::where("type", "=", $relation["line_type"]);
 
+                  // Get the starting and ending marker types
+                  $startingMarker = RelationshipMarker::where("type", "=", $relation["starting_marker_type"]);
+                  $endingMarker   = RelationshipMarker::where("type", "=", $relation["ending_marker_type"]);
+
+                  // TODO error checking
+
+                  $relationship = Relationship::where("starting_class_id", "=", $relation["starting_class_id"])->where("ending_class_id", "=", $relation["ending_class_id"])->firstOrNew(
+                     [
+                     "starting_class_id"  => $relation["starting_class_id"],
+                     "ending_class_id"    => $relation["ending_class_id"]
+                     ]
+                  );
+
+                  $relationship->starting_marker_id = $startingMarker->id;
+                  $relationship->ending_marker_id   = $endingMarker->id;
+                  $relationship->line_id            = $line->id;
+
+                  $relationship.save();
+               }
+            }
          }
 
          // Now all classes saved from the user have been updated. Remove any old classes of the current model
-         $oldClasses = ClassObj::where("model_id", "=", $model->id)->where("updated_at", "<", $currentTime)->get();
+         $deletedClasses = $request->input("deletedClasses", "{}");
+         $deletedClasses = \json_decode($deletedClasses, true);
+
          
-         foreach ($oldClasses as $oldClass) {
+         foreach ($deletedClasses as $oldClass) {
+            echo "Processing Class: $oldClass\n"; 
+            $curClass = ClassObj::where("name", "=", $oldClass)->where("model_id", "=", $model->id)->first();
+            if($curClass == null)
+            {
+               echo "\tClass Not Found";
+               continue;
+            }
 
             // Ensure the children are removed
-            $oldClass->Attributes()->delete();
-            $oldClass->Operations()->delete();
-            $oldClass->delete();
+            $curClass->Attributes()->delete();
+            $curClass->Operations()->delete();
+            $curClass->delete();
          }
       }
 
