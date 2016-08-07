@@ -16,7 +16,6 @@ use App\Models\Attribute;
 use App\Models\Operation;
 use Carbon\Carbon;
 use Log;
-use App\Helpers\ProjectHelper;
 
 class ProjectController extends Controller
 {
@@ -93,6 +92,17 @@ class ProjectController extends Controller
             "url" => $url
          ]);
 
+         if($type == "empty")
+         {
+            ModelObj::create(["branch"=> null, "project_id" => $project->id]);
+         }else if($type == "github"){
+            $branches = GitHubHelper::listProjectBranches($project);
+            foreach($branches as $branch)
+            {
+               ModelObj::create(["branch"=> $branch, "project_id" => $project->id]);
+            }
+         }  
+
    		return response()->json(["success" => true, "projectName" => $name]);
    	}
 
@@ -111,6 +121,11 @@ class ProjectController extends Controller
 
       public function save(Request $request, $project, $branch = null) {
          
+         if($branch == "null")
+         {
+            $branch = null;
+         }
+
          // Get the current timestamp which will be used for removing old attributes, functions, and classes later on
          $currentTime = Carbon::now()->toDateTimeString();
          

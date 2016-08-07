@@ -37,6 +37,10 @@ class ClassController extends Controller
           }
 
           $branch = $request->input("branch", null);
+          if($branch == "null")
+          {
+            $branch = null;
+          }
 
           if($project->type == "github" && $branch == null)
           {
