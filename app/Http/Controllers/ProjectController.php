@@ -141,7 +141,7 @@ class ProjectController extends Controller
          }
 
          // If the branch is null and the project is of github type, error
-         if ($branch == null && ProjectType::where("id", "=", $proj->project_type_id)->get()->name == "github") { 
+         if ($branch == null && ProjectType::where("id", "=", $proj->project_type_id)->first()->name == "github") { 
             return response()->json(["success" => false, "message" => "Github project cannot have a branch value of NULL"]);
          }
 
@@ -170,7 +170,7 @@ class ProjectController extends Controller
                continue;
             }
 
-            $curClass = ClassObj::where("id", "=", $classId)->where("model_id", "=", $model->id)->get();
+            $curClass = ClassObj::where("id", "=", $classId)->where("model_id", "=", $model->id)->first();
 
             if ($curClass == null) {
                continue;
@@ -265,10 +265,10 @@ class ProjectController extends Controller
 
                   // TODO error checking
 
-                  $relationship = Relationship::where("starting_class_id", "=", $relation["starting_class_id"])->where("ending_class_id", "=", $relation["ending_class_id"])->firstOrNew(
+                  $relationship = Relationship::where("starting_class_id", "=", $relation["startingClassId"])->where("ending_class_id", "=", $relation["endingClassId"])->firstOrNew(
                      [
-                     "starting_class_id"  => $relation["starting_class_id"],
-                     "ending_class_id"    => $relation["ending_class_id"]
+                     "starting_class_id"  => $relation["startingClassId"],
+                     "ending_class_id"    => $relation["endingClassId"]
                      ]
                   );
 
