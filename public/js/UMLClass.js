@@ -28,11 +28,13 @@ var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 		postData["deletedClasses"] = JSON.stringify(changedItems);
 	}
 
+	postData["branch"] = $("#current_branch").val();
+
 
 	$.ajax({
-		url: UMLClassSaveURL+"/"+$("#current_branch").val(), //declared global in dashboard.blade.php 
+		url: UMLClassSaveURL, //declared global in dashboard.blade.php 
 		method: "POST",
-		data: {savedItems: JSON.stringify(postData)},
+		data: postData,
 		success: successCB,
 		fail: failCB
 	});
@@ -416,7 +418,7 @@ UMLClass.prototype = {
 		if(this.relationships[type] == undefined){
 			this.relationships[type] = [];
 		}
-		
+
 		this.relationships[type].push(className);
 
 		var classes = "line";
