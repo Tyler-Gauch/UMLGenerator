@@ -96,10 +96,11 @@ class ProjectController extends Controller
          {
             ModelObj::create(["branch"=> null, "project_id" => $project->id]);
          }else if($type == "github"){
-            $branches = GitHubHelper::listProjectBranches($project);
+            $githubHelper = new GitHubHelper(Auth::user());
+            $branches = $githubHelper->listProjectBranches($project, true);
             foreach($branches as $branch)
             {
-               ModelObj::create(["branch"=> $branch, "project_id" => $project->id]);
+               ModelObj::create(["branch"=> $branch["name"], "project_id" => $project->id]);
             }
          }  
 
