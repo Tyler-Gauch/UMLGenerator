@@ -120,8 +120,9 @@ class ProjectController extends Controller
          return response()->json($data);
       }
 
-      public function save(Request $request, $project, $branch = null) {
+      public function save(Request $request, $project) {
          
+         $branch = $request->input("branch", null);
          if($branch == "null")
          {
             $branch = null;

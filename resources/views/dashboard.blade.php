@@ -478,7 +478,7 @@
 		@if(isset($project))
 		var projectName = "{{ $project->name }}";
 		var projectId = "{{ $project->id }}";
-		UMLClassSaveURL = projectName+"/save";
+		UMLClassSaveURL = encodeURIComponent(projectName)+"/save";
 		var loadFromUrl = @if($project->url == null) false; @else true; @endif;
 		@else
 			$("#initial_prompt").modal("show");
