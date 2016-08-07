@@ -521,7 +521,8 @@ UMLClass.prototype = {
 			type: this.classType,
 			attributes: attr,
 			functions: funcs,
-			relationships: this.relationships
+			relationships: this.relationships,
+			dbId: this.dbId
 		};
 	},
 	save: function(successCB = function(){}, failCB = function(){}){
