@@ -399,33 +399,32 @@ UMLClass.prototype = {
 			//check if we have the propper marker for this class
 			if(type == "implements" && (startMarker != "url(#arrowEmpty)" || dotted != "5,5"))
 			{
+				setClassEdited(this);
 				$path.attr("marker-start","url(#arrowEmpty)");
 				$path.attr("stoke-dasharray", "5,5");
 			}else if(type == "inherits" && startMarker != "url(#arrowEmpty)")
 			{
+				setClassEdited(this);
 				$path.attr("marker-start", "url(#arrowEmpty)");
 			}else if(type == "aggregation" && startMarker != "url(#diamondEmpty)")
 			{
+				setClassEdited(this);
 				$path.attr("marker-start", "url(#diamondEmpty)");
 			}else if(type == "composite-aggregation" && startMarker != "url(#diamondFill)")
 			{
+				setClassEdited(this);
 				$path.attr("marker-start", "url(#diamondFill)");
 			}
 			return;
 		}
-
-		//if if doesn't exist this class is the start class
-		if(this.relationships[type] == undefined){
-			this.relationships[type] = [];
-		}
-
-		this.relationships[type].push(className);
 
 		var classes = "line";
 		if(this.hovering || umlClass.hovering)
 		{
 			classes += " hover";
 		}
+
+		setClassEdited(this);
 
 		var path = '<svg height="5000" width="5000" data-start="class_'+this.id+'" data-end="class_'+umlClass.id+'">';
 			path += "<path id='relationship_class_"+this.id+"_class_"+umlClass.id+"' class='"+classes+"' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'";
@@ -531,8 +530,48 @@ UMLClass.prototype = {
 			attr.push(a);
 		});
 
+		var rels = [];
+		var startingClass = this;
+
 		$(document).find("[data-start='class_"+this.id+"']").each(function(){
-			$path = $(this);
+			$path = $($(this).children()[0]);
+
+			var endingClass = UMLClasses[$(this).data("end")];
+
+			var startingMarker = $path.attr("marker-start");
+			if(startingMarker == "" || startingMarker == null || startingMarker == undefined)
+			{
+				startingMarker = "none";
+			}else{
+				startingMarker = startingMarker.replace("url(#", "").replace(")", "");
+			}
+
+			var endingMarker = $path.attr("marker-end");
+			if(endingMarker == "" || endingMarker == null || endingMarker == undefined)
+			{
+				endingMarker = "none";
+			}else{
+				endingMarker = endingMarker.replace("url(#", "").replace(")", "");
+			}
+
+
+			var lineType = $path.attr("stroke-dasharray");
+			if(lineType == "" || lineType == null || lineType == undefined)
+			{
+				lineType = "dashed";
+			}else{
+				lineType = "solid";
+			}
+
+			var rel = {};
+			rel["starting_class_id"] = startingClass.dbId;
+			rel["ending_class_id"] = endingClass.dbId;
+			rel["starting_marker_type"] = startingMarker;
+			rel["ending_marker_type"] = endingMarker;
+			rel["line_type"] = lineType;
+
+			rels.push(rel);
+
 		});
 
 		return {
@@ -542,7 +581,7 @@ UMLClass.prototype = {
 			type: this.classType,
 			attributes: attr,
 			functions: funcs,
-			relationships: this.relationships,
+			relationships: rels,
 			dbId: this.dbId
 		};
 	},
