@@ -253,23 +253,23 @@ class ProjectController extends Controller
                Operation::where("class_id", "=", $curClass->id)->where("updated_at", "<", $currentTime)->delete();
             }
 
-            // TODO - Change to match class ids
             if (isset($curObj["relationships"])) {
                foreach ($curObj["relationships"] as $relation) {
 
                   // Get the line type
-                  $line = RelationshipLine::where("type", "=", $relation["line_type"]);
+                  $line = RelationshipLine::where("type", "=", $relation["line_type"])->first();
 
                   // Get the starting and ending marker types
-                  $startingMarker = RelationshipMarker::where("type", "=", $relation["starting_marker_type"]);
-                  $endingMarker   = RelationshipMarker::where("type", "=", $relation["ending_marker_type"]);
+                  $startingMarker = RelationshipMarker::where("type", "=", $relation["starting_marker_type"])->first();
+                  $endingMarker   = RelationshipMarker::where("type", "=", $relation["ending_marker_type"])->first();
+
 
                   // TODO error checking
 
-                  $relationship = Relationship::where("starting_class_id", "=", $relation["startingClassId"])->where("ending_class_id", "=", $relation["endingClassId"])->firstOrNew(
+                  $relationship = Relationship::where("starting_class_id", "=", $relation["starting_class_id"])->where("ending_class_id", "=", $relation["ending_class_id"])->firstOrNew(
                      [
-                     "starting_class_id"  => $relation["startingClassId"],
-                     "ending_class_id"    => $relation["endingClassId"]
+                     "starting_class_id"  => $relation["starting_class_id"],
+                     "ending_class_id"    => $relation["ending_class_id"]
                      ]
                   );
 
@@ -277,7 +277,7 @@ class ProjectController extends Controller
                   $relationship->ending_marker_id   = $endingMarker->id;
                   $relationship->line_id            = $line->id;
 
-                  $relationship.save();
+                  $relationship->save();
                }
             }
          }
@@ -374,6 +374,16 @@ class ProjectController extends Controller
                $o["isFinal"] = $operation->is_final;
                $o["isabstract"] = $operation->is_abstract;
                $c["functions"][] = $o;
+            }
+            foreach($class->StartingRelationship()->get() as $relationship) 
+            {
+               $r = [];
+               $r["starting_class_id"] = $relationship->starting_class_id;
+               $r["ending_class_id"] = $relationship->ending_class_id;
+               $r["marker-start"] = $relationship->StartingRelationshipMarker->type;
+               $r["marker-end"] = $relationship->StartingRelationshipMarker->type;
+               $r["line_type"] = $relationship->RelationshipLine->type;
+               $c["relationships"]["custom"][] =$r;
             }
 
             $m[] = $c;

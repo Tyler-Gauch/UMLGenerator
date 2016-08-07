@@ -448,14 +448,6 @@ UMLClass.prototype = {
 
 		$(".umlcanvas").append(path);
 
-		this.relationships.push({
-			starting_class_name: this.className,
-			ending_class_name: umlClass.className,
-			starting_marker_type: "None",
-			ending_marker_type: "None",
-			line_type: "Solid"
-		});
-
 		$("#relationship_class_"+this.id+"_class_"+umlClass.id).click();
 	},
 	select: function(){

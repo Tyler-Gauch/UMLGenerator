@@ -6,7 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Relationship;
 
-class RelationshipMarkers extends Model
+class RelationshipMarker extends Model
 {
 
     /**

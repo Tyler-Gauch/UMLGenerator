@@ -19,11 +19,12 @@ class CreateRelationship extends Migration
         });
 
         DB::table("relationship_markers")->insert(array(
-            array("type" => "None"),
-            array("type" => "Arrow"),
-            array("type" => "Arrow Filled"),
-            array("type" => "Diamond"),
-            array("type" => "Diamond Filled")));
+            array("type" => "none"),
+            array("type" => "arrowEmpty"),
+            array("type" => "arrowLine"),
+            array("type" => "arrowFilled"),
+            array("type" => "diamondEmpty"),
+            array("type" => "diamondFilled")));
     
         // Create line type table
         Schema::create("relationship_lines", function(Blueprint $table) {
@@ -32,8 +33,8 @@ class CreateRelationship extends Migration
         });
 
         DB::table("relationship_lines")->insert(array(
-            array("type" => "Solid"),
-            array("type" => "Dotted")));
+            array("type" => "solid"),
+            array("type" => "dashed")));
 
 
         // Create relationships table
