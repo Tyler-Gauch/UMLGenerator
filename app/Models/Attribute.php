@@ -14,7 +14,7 @@ class Attribute extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'class_id', 'visibility', 'type', 'default_value', 'is_static', 'is_final', 'is_abstrct'
+        'name', 'class_id', 'visibility', 'type', 'default_value', 'is_static', 'is_final', 'is_abstract'
     ];
 
     // public $timestamps = false;

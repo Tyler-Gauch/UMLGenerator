@@ -114,6 +114,7 @@
 						<div class="row">
 							<select id="edit_line_start" class="form-control allow-hotkeys">
 								<option value="none">None</option>
+								<option value="arrowLine">Arrow Line</option>
 								<option value="arrowEmpty">Arrow</option>
 								<option value="arrowFill">Arrow Filled</option>
 								<option value="diamondEmpty">Diamond</option>
@@ -143,6 +144,7 @@
 						<div class="row">
 							<select id="edit_line_end" class="form-control allow-hotkeys">
 								<option value="none">None</option>
+								<option value="arrowLine">Arrow Line</option>
 								<option value="arrowEmpty">Arrow</option>
 								<option value="arrowFill">Arrow Filled</option>
 								<option value="diamondEmpty">Diamond</option>
@@ -245,7 +247,7 @@
 					    	<path d="M0,0 L0,6 L9,3 z" class="marker"/>
 					    </marker>
 					    <marker id="arrowLine" markerWidth="12" markerHeight="12" refx="9" refy="3" orient="auto-start-reverse" markerUnits="strokeWidth">
-					    	<path d="M0,6 L9,3 L0,0" class="marker"/>
+					    	<path d="M0,6 L9,3 M0,0 L9,3" class="marker"/>
 					    </marker>
 					  </defs>
 				</svg>
@@ -475,6 +477,7 @@
 		var autoSaveTimeout = 2500; //inactivity for more than x milliseconds triggers an autosave
 		@if(isset($project))
 		var projectName = "{{ $project->name }}";
+		var projectId = "{{ $project->id }}";
 		UMLClassSaveURL = projectName+"/save";
 		var loadFromUrl = @if($project->url == null) false; @else true; @endif;
 		@else
@@ -718,8 +721,6 @@
 				}
 
 				$("#edit_line_target").val(path.attr("id"));
-
-				console.log(path);
 			});
 
 			$("#edit_line_start").on("change", function(){
