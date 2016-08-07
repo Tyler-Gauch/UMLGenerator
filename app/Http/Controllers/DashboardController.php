@@ -20,7 +20,7 @@ class DashboardController extends Controller
    		if($project != null)
    		{
             $data["project"] = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
-
+            $data["model"] = $data["project"]->Models()->first();
             // Get the project type
             $type = $data["project"]->ProjectType;
 
@@ -34,7 +34,7 @@ class DashboardController extends Controller
             if ($type->name != "empty") {
                   $github = new GitHubHelper(Auth::user());
                   $data["branches"] = $github->listProjectBranches($data["project"]);
-           }
+            }
    		}
    		return response()->view("dashboard", $data);
    	}

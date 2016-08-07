@@ -281,6 +281,7 @@ class ProjectController extends Controller
             $c["attributes"] = [];
             $c["functions"] = [];
             $c["relationships"] = [];
+            $c["dbId"] = $class->id;
 
             foreach($class->Attributes()->get() as $attribute)
             {  

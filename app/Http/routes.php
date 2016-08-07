@@ -23,6 +23,7 @@ Route::group(["prefix" => "/auth"], function(){
 	
 });
 
+
 Route::group(["middleware" => 'auth'], function(){
 	Route::get('/{project?}', "DashboardController@index");
 	Route::post('/{project}/save/{branch?}', "ProjectController@save");
@@ -36,4 +37,6 @@ Route::group(["middleware" => 'auth'], function(){
 	
 	Route::post("/project/create", 'ProjectController@create');
 	Route::get("/project/get/{project?}", 'ProjectController@get');
+
+	Route::post('/class/create', "ClassController@create");
 });

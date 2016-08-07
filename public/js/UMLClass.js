@@ -71,10 +71,9 @@ var UMLClassSaveChanged = function(successCB = function(){}, failCB = function()
 }
 
 var UMLClass = function(config){
-	var className = config.className;
-	if(className == null || className == undefined || className == "")
+	if(config.className == null || config.className == undefined || config.className == "")
 	{
-		className = "Class"+UMLClassID;
+		config.className = "Class"+UMLClassID;
 	}
 	if(!$.isArray(config.attributes))
 	{
@@ -99,7 +98,7 @@ var UMLClass = function(config){
 	{
 		config.classType = "class";
 	}
-	this.className = className;
+	this.className = config.className;
 	this.attributes = config.attributes;
 	this.functions = config.functions;
 	this.relationships = config.relationships;
@@ -112,12 +111,38 @@ var UMLClass = function(config){
 	this.selected = false;
 	this.moving = false;
 	this.hovering = false;
-	UMLClasses["class_"+this.id] = this;
-	this.render();
+
+	var t = this;
+	if(config.dbId == undefined)
+	{
+		config["branch"] = $("#current_branch").val();
+		config["projectId"] = projectId; //declared global in blade
+
+		$.ajax({
+			data: config,
+			method: "POST",
+			url: "/class/create",
+			success: function(data){
+				if(data.success)
+				{	
+					t.dbId = data.id;
+					UMLClasses["class_"+t.id] = t;
+					t.render();
+				}else{
+					alert(data.message);
+				}
+			}
+		});
+	}else{
+		t.dbId = config.dbId;
+		UMLClasses["class_"+t.id] = t;
+		t.render();
+	}
 };
 
 UMLClass.prototype = {
 	id: -1,
+	dbId: -1,
 	className: "Class",
 	classType: "class",
 	attributes: [],
@@ -330,6 +355,8 @@ UMLClass.prototype = {
 				umlClass = value;
 			}
 		});
+
+		//remove the classname from the array if it isn't a class
 		if(umlClass == null)
 		{
 			this.relationships = $.grep(this.relationships, function(value){
@@ -378,6 +405,9 @@ UMLClass.prototype = {
 			}
 			return;
 		}
+
+		//if if doesn't exist this class is the start class
+		this.relationships[type].push(className);
 
 		var classes = "line";
 		if(this.hovering || umlClass.hovering)
@@ -478,6 +508,10 @@ UMLClass.prototype = {
 			a["isAbstract"] = (value.isAbstract == undefined ? false : value.isAbstract);
 
 			attr.push(a);
+		});
+
+		$(document).find("[data-start='class_"+this.id+"']").each(function(){
+			$path = $(this);
 		});
 
 		return {
