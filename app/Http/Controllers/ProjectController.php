@@ -118,7 +118,16 @@ class ProjectController extends Controller
          $currentTime = Carbon::now()->toDateTimeString();
          
          // Get the project id of the current project and add the model
-         $proj = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
+         $proj = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->first();
+
+         if ($proj == null) {
+            return response()->json(["success" => false, "message" => "project not found"]);
+         }
+
+         // If the branch is null and the project is of github type, error
+         if ($branch == null && ProjectType::where("id", "=", $proj->project_type_id)->get()->name == "github") { 
+            return response()->json(["success" => false, "message" => "Github project cannot have a branch value of NULL"]);
+         }
 
          // Get the model of the github branch or NULL if empty project
          $model = ModelObj::where("project_id", "=", $proj["id"])->where("branch", "=", $branch)->firstOrCreate(
@@ -134,20 +143,25 @@ class ProjectController extends Controller
          // Loop through classes from user input
          foreach ($savedItems as $curObj) {
             Log::info("Processing Class: {$curObj['className']}");
-            $className  = $curObj["className"];
-            $locX       = $curObj["x"];  // starting x coordinate of the class 
-            $locY       = $curObj["y"];  // starting y coordinate of the class
-            $classType  = $curObj["type"];
+            $classId    = ( isset($curObj["classId"]) ? $curObj["classId"], null);
+            $className  = ( isset($curObj["className"]) ? $curObj["className"], null);
+            $locX       = ( isset($curObj["x"]) ? $curObj["x"], 0);  // starting x coordinate of the class 
+            $locY       = ( isset($curObj["y"]) ? $curObj["y"], 0);  // starting y coordinate of the class
+            $classType  = ( isset($curObj["type"]) ? $curObj["type"], "class");
 
-            // Create the class in the database
-            $curClass = ClassObj::where("name", "=", $className)->where("model_id", "=", $model->id)->firstOrNew(
-               [
-               "name"      => $className,
-               "model_id"  => $model->id
-               ]
-            );
+            // The class should have already been created. If there is no ID or it doesnt belong with the model, ignore it
+            if ($classId == null || $className == null) {
+               continue;
+            }
+
+            $curClass = ClassObj::where("id", "=", $classId)->where("model_id", "=", $model->id)->get();
+
+            if ($curClass == null) {
+               continue;
+            }
 
             // Update the values
+            $curClass->name      = $className;
             $curClass->locationX = $locX;
             $curClass->locationY = $locY;
             $curClass->type      = $classType;
@@ -171,13 +185,13 @@ class ProjectController extends Controller
                   );
 
                   // Update the values
-                  $attribute->visibility  = ( isset($attr["visibility"]) ? $attr["visibility"] : "public");
-                  $attribute->type = ( isset($attr["type"]) ? $attr["type"] : ""); //constructors have no type
-                  $attribute->is_static   = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
-                  $attribute->is_final    = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
-                  $attribute->is_abstract = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
-                  $attribute->default_value = ( isset($attr["default"]) ? $attr["default"] : "");
-                  $attribute->updated_at  = $currentTime; 
+                  $attribute->visibility     = ( isset($attr["visibility"]) ? $attr["visibility"] : "public");
+                  $attribute->type           = ( isset($attr["type"]) ? $attr["type"] : ""); //constructors have no type
+                  $attribute->is_static      = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
+                  $attribute->is_final       = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
+                  $attribute->is_abstract    = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
+                  $attribute->default_value  = ( isset($attr["default"]) ? $attr["default"] : "");
+                  $attribute->updated_at     = $currentTime; 
                   
                   // TODO default value doesnt show up right, has a colon
 
@@ -270,6 +284,11 @@ class ProjectController extends Controller
             $curClass->Operations()->delete();
             $curClass->delete();
          }
+          
+         $data = [];
+         $data["success"] = true;
+
+         return response()->json($data);
       }
 
 
