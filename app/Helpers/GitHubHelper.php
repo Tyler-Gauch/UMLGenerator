@@ -34,7 +34,7 @@ class GitHubHelper{
 		return $list;
 	}
 
-	public function listBranches($repoId){
+	public function listBranches($repoId, $asArray = false){
 		$repos = $this->listRepos();
 
 		foreach($repos as $key=>$repo)
@@ -53,7 +53,7 @@ class GitHubHelper{
 			return [];
 		}
 
-		$list = json_decode((string)$response->getBody());
+		$list = json_decode((string)$response->getBody(), $asArray);
 
 		return $list;
 	}
@@ -120,7 +120,7 @@ class GitHubHelper{
 		return ["success" => true, "filename" => $filename];
 	}
 
-	public function listProjectBranches(Project $project){
+	public function listProjectBranches(Project $project, $asArray = false){
 		
 		if($project->ProjectType->name != "github")
 		{
@@ -129,7 +129,7 @@ class GitHubHelper{
 
 		if($project->repo != null)
 		{
-			return $this->listBranches($project->repo);
+			return $this->listBranches($project->repo, $asArray);
 		}
 
 		$url = $project->url;
@@ -144,7 +144,7 @@ class GitHubHelper{
 			return [];
 		}
 
-		$list = json_decode((string)$response->getBody());
+		$list = json_decode((string)$response->getBody(), $asArray);
 
 		return $list;
 	}
