@@ -110,7 +110,7 @@ abstract class ParserHelper {
 		return in_array($word, $this->keywords);
 	}
 
-	protected function eatWhiteSpace($tempIterator){		
+	protected function eatWhiteSpace($tempIterator){
 		for($tempIterator; $tempIterator < strlen($this->fileContents); $tempIterator++){
 
 			switch($this->fileContents[$tempIterator])
@@ -148,6 +148,10 @@ abstract class ParserHelper {
         	$result = $javaParser->parse();	
         	$result["fileName"] = $fileName;
         	$results[] = $result;
+        	foreach($result["nestedClasses"] as $key=>$nestedClass){
+        		$nestedClass["fileName"] = $fileName;
+        		$results[] = $nestedClass;
+        	}
 		}
 	}
 
@@ -158,7 +162,6 @@ abstract class ParserHelper {
 		//now we want to see if any class references any other class
 		//there must be a better way of doing this but im tired
 		//and can't think of it right now
-
 		foreach($results as $key=>$class)
 		{
 			foreach($results as $key2=>$class2)

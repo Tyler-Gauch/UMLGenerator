@@ -290,61 +290,74 @@ $(document).ready(function(){
 		});
 	}
 
+	var numberOfClasses = 0;
 	function getBranchFromGitHub(project, branch, t = null){
-		window.showLoader("Loading your project from github...");
-		$.ajax({
-			url: "/parser/"+project,
-			data: {branch: branch},
-			method: "GET",
-			success: function(data){
-				window.hideLoader();
-				if(data.success)
-				{
-					if(t!=null){
-						$(".edit_class_branch").each(function(){
-							$(this).children().each(function(){
-								$(this).removeClass("fa-check");
+		if(confirm("Are you sure you want to reload from github? This will overwrite your current project and this is not reversible."))
+		{
+			window.showLoader("Loading your project from github...");
+			$.ajax({
+				url: "/parser/"+project,
+				data: {branch: branch},
+				method: "GET",
+				success: function(data){
+					window.hideLoader();
+					if(data.success)
+					{
+						if(t!=null){
+							$(".edit_class_branch").each(function(){
+								$(this).children().each(function(){
+									$(this).removeClass("fa-check");
+								});
 							});
+
+							t.children().each(function(){
+								$(this).addClass("fa-check");
+							});
+						}
+
+						//remove all the current classes
+						$.each(UMLClasses, function(id, umlClass){
+							umlClass.destroy();
 						});
 
-						t.children().each(function(){
-							$(this).addClass("fa-check");
+						$("#edit_target").val("null");
+
+						numberOfClasses = data.data.length;
+
+						$.each(data.data, function(key, value){
+							var umlClass = new UMLClass(value, buildRelationships);
 						});
+
+						$("#list_view").empty();					
+
+						needsSave = true;
+
+					}else{
+						alert("Error: "+data.message);
 					}
-
-					//remove all the current classes
-					$.each(UMLClasses, function(id, umlClass){
-						umlClass.destroy();
-					});
-
-					$("#edit_target").val("null");
-
-					$.each(data.data, function(key, value){
-						var umlClass = new UMLClass(value);
-					});
-
-					$("#list_view").empty();					
-
-					$.each(UMLClasses, function(id, umlClass){
-
-						addClassToListView(umlClass);
-
-						$.each(umlClass.relationships, function(type, relations){
-							console.log(type, relations);
-							$.each(relations, function(key, className){
-								console.log(key, className);
-								umlClass.addRelationship(className, type);
-							});
-						});
-					});
-
-					needsSave = true;
-
-				}else{
-					alert("Error: "+data.message);
 				}
-			}
-		});
+			});
+		}
+	}
+
+	function buildRelationships(){
+		console.log("Building relationships...", Object.keys(UMLClasses).length, numberOfClasses);
+		if(Object.keys(UMLClasses).length == numberOfClasses)
+		{
+			console.log("Building");
+			$.each(UMLClasses, function(id, umlClass){
+
+				addClassToListView(umlClass);
+
+				$.each(umlClass.relationships, function(type, relations){
+					console.log("relationship:", type, relations);
+					$.each(relations, function(key, className){
+						umlClass.addRelationship(className, type);
+					});
+					setClassEdited(umlClass);
+				});
+			});
+		}
 	}
 
 	$("#force_github_load").on("click", function(e){

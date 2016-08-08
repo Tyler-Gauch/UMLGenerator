@@ -159,7 +159,6 @@ class JavaParserHelper extends ParserHelper {
 						}
 						$parameters = preg_replace('/[\(]?+[\)]?+/', "", $parameters);
 						$parameters = explode(",", $parameters);
-						Log::info(print_r($parameters, 1));
 						$params = "(";
 						foreach($parameters as $key=>$parameter)
 						{
@@ -198,10 +197,14 @@ class JavaParserHelper extends ParserHelper {
 						//now that we had a function we want to eat through all the function code to get past it.
 						$this->iterator = $this->iterator-5;
 						$braceCount = 1;
-						for($this->iterator = strpos($this->fileContents, "{", $this->iterator)+1; $this->iterator < strlen($this->fileContents); $this->iterator++)
+						for($this->iterator = strpos($this->fileContents, "{", $this->iterator)+1; $this->iterator < strlen($this->fileContents)-1; $this->iterator++)
 						{
 							$this->iterator = $this->eatWhiteSpace($this->iterator);
 							$this->iterator = $this->eatComments($this->iterator);
+							if($this->iterator > strlen($this->fileContents)-1)
+							{
+								break;
+							}
 							switch($this->fileContents[$this->iterator])
 							{
 								case "{":
@@ -304,7 +307,7 @@ class JavaParserHelper extends ParserHelper {
 								$blockComment = true;
 								break;
 							default:
-								return $tempIterator-2;
+								return $tempIterator-1;
 						}
 						break;
 					default:

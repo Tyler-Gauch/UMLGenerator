@@ -76,7 +76,7 @@ var UMLClassSaveChanged = function(successCB = function(){}, failCB = function()
 	});
 }
 
-var UMLClass = function(config){
+var UMLClass = function(config, createCallback){
 	if(config.className == null || config.className == undefined || config.className == "")
 	{
 		config.className = "Class"+UMLClassID;
@@ -131,9 +131,11 @@ var UMLClass = function(config){
 			success: function(data){
 				if(data.success)
 				{	
+					console.log("created", t.className);
 					t.dbId = data.id;
 					UMLClasses["class_"+t.id] = t;
 					t.render();
+					createCallback();
 				}else{
 					alert(data.message);
 				}
@@ -264,6 +266,8 @@ UMLClass.prototype = {
 		});
 	},
 	destroy: function(){
+		$(document).find("[data-end='class_"+this.id+"']").remove();
+		$(document).find("[data-start='class_"+this.id+"']").remove();
 		$("#class_"+this.id+"_parent").remove();
 		delete UMLClasses["class_"+this.id];
 	},
@@ -426,7 +430,7 @@ UMLClass.prototype = {
 
 		setClassEdited(this);
 
-		var path = '<svg height="5000" width="5000" data-start="class_'+this.id+'" data-end="class_'+umlClass.id+'">';
+		var path = '<svg data-start="class_'+this.id+'" data-end="class_'+umlClass.id+'">';
 			path += "<path id='relationship_class_"+this.id+"_class_"+umlClass.id+"' class='"+classes+"' stroke-width='2px' stroke='black' d='M"+startPoint.x+" "+startPoint.y+" L"+endPoint.x+" "+endPoint.y+"'";
 
 			if(type == "implements")

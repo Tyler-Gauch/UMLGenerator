@@ -73,6 +73,20 @@ class ParserController extends Controller{
 			$results["success"] = true;
 			$results["data"] = ParserHelper::getUMLInfo($filename);
 			system('/bin/rm -rf ' . escapeshellarg($filename));
+
+			//delete the current classes
+			$model = $project->Models()->where("branch", "=", $branch)->first();
+			$classes = $model->Classes()->get();
+
+			foreach($classes as $key=>$class)
+			{
+				$class->Attributes()->delete();
+				$class->Operations()->delete();
+				$class->StartingRelationship()->delete();
+				$class->EndingRelationship()->delete();
+				$class->delete();
+			}
+
 			return response()->json($results);
 		}
 

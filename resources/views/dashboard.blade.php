@@ -542,7 +542,12 @@
 					success: function(data){
 						if(data.success)
 						{
-							console.log(data);
+							$("#edit_target").val("null");
+							$.each(UMLClasses, function(key, umlClass){
+								removeClassFromListView(umlClass.id);
+								umlClass.destroy();
+							});
+
 							$.each(data.model, function(key, umlClass){
 								addClass(umlClass);
 							});
@@ -590,16 +595,20 @@
 				if(!beSubtle){
 					window.showLoader("Please Wait.  Saving in Progess...");
 				}else{
+					console.log("triggered");
 					$("#subtle_save_gear").css("display", "block");
 				}
-				UMLClassSaveChanged(window.hideLoader());
+				UMLClassSaveChanged(function(){
+					if(beSubtle)
+					{
+						$("#subtle_save_gear").css("display", "none");
+					}else{
+						window.hideLoader();
+					}
+				});
 				delete holderObject["editedClasses"];
 				delete holderObject["deletedClasses"];
 				needsSave = false;
-				if(beSubtle)
-				{
-					$("#subtle_save_gear").css("display", "none");
-				}
 			@endif
 		}
 

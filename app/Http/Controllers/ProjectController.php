@@ -299,6 +299,8 @@ class ProjectController extends Controller
             // Ensure the children are removed
             $curClass->Attributes()->delete();
             $curClass->Operations()->delete();
+            $curClass->StartingRelationships()->delete();
+            $curClass->EndingRelationships()->delete();
             $curClass->delete();
          }
           
