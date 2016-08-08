@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string("provider_id");
             $table->string("username")->unique();
             $table->string("access_token", 1024);
+            $table->string("provider");
             $table->rememberToken();
             $table->timestamps();
         });

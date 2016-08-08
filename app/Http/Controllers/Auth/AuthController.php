@@ -61,7 +61,7 @@ class AuthController extends Controller
             $result["token"] = $token;
 
             Log::info("Data base find or create user");
-            $user = $this->findOrCreateUser($result);
+            $user = $this->findOrCreateUser($result, "GITHUB");
 
             $user->access_token = $token->getAccessToken();
             $user->addRole("USER");
@@ -80,7 +80,7 @@ class AuthController extends Controller
     public function loginAsGuest(Request $request)
     {
         Log::info("Logging in as guest");
-        $user = $this->findOrCreateUser(["email" => "guest@uml.tgauch.net", "id" => 0, "username" => "UML_Guest", "access_token" => ""]);
+        $user = $this->findOrCreateUser(["name" => "Guest", "email" => "guest@uml.tgauch.net", "id" => 0, "login" => "UML_Guest", "access_token" => ""], "GUEST");
         $user->addRole("GUEST");
         $user->save();
         Auth::login($user);
@@ -94,16 +94,18 @@ class AuthController extends Controller
         return \OAuth::consumer("GitHub", $creds);
     }
 
-    private function findOrCreateUser($user){
-        if(($authUser = User::where("email", "=", $user["email"])->where ("provider_id", "=", $user ["id"])->first()) != null){
+    private function findOrCreateUser($user, $provider){
+        if(($authUser = User::where("provider_id", "=", $user ["id"])->where("provider", "=", $provider)->first()) != null){
             return $authUser;
         }else{
+            print_r($user);
             return User::create([
                 "name" => $user["name"],
                 "email" => $user["email"],
                 "provider_id" => $user["id"],
                 "username" => $user["login"],
                 "access_token" => "",
+                "provider" => $provider
             ]);
         }
     }

@@ -500,6 +500,7 @@
 		}
 
 		function addClassToListView(umlClass){
+			console.log("Adding to list view", umlClass.id);
 			var lv = $("#list_view");
 			var html = '<div class="col-lg-12 list_view_element" data-target="class_'+umlClass.id+'" id="list_view_class_'+umlClass.id+'">'+
 							'<strong>'+umlClass.className+'</strong>'+
@@ -510,13 +511,12 @@
 
 		function removeClassFromListView(umlClassId)
 		{
+			console.log("Removing from list view", umlClassId);
 			$("#list_view_class_"+umlClassId).remove();
 		}
 
 		function addClass(obj = {}){
-			console.log("adding class", obj);
 			var umlclass = new UMLClass(obj, function(){
-				addClassToListView(umlclass);
 				$("#select").click();
 				$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
 				$("#class_"+umlclass.id).mouseup();
@@ -530,7 +530,6 @@
 		}
 		@if(isset($project))
 			function loadProjectModels(branch = null, callback=function(){}){	
-				console.log("Loading Project Models");
 				var postData = {};
 				if(branch != null)
 				{
@@ -544,7 +543,6 @@
 					success: function(data){
 						if(data.success)
 						{
-							console.log("Model Loaded");
 							$("#edit_target").val("null");
 							$.each(UMLClasses, function(key, umlClass){
 								removeClassFromListView(umlClass.id);
@@ -598,7 +596,6 @@
 				if(!beSubtle){
 					window.showLoader("Please Wait.  Saving in Progess...");
 				}else{
-					console.log("triggered");
 					$("#subtle_save_gear").css("display", "block");
 				}
 				UMLClassSaveChanged(function(){
@@ -676,7 +673,6 @@
 				$(".list_view_element").find("span").remove();
 				if(needsSave)
 				{
-					console.log("Needs save");
 					$.each(holderObject["editedClasses"], function(key, umlClass){
 						$("#list_view_class_"+umlClass.id).append("<span>*</span>");
 					});
@@ -727,8 +723,6 @@
 				var endMarker = path.attr("marker-end");
 				var dashArray = path.attr("stroke-dasharray");
 
-				console.log("startMarker: " + startMarker + ", endMarker: " + endMarker + ", dashArray: " + dashArray);
-
 				if(startMarker == undefined)
 				{
 					$("#edit_line_start").val("none");
@@ -760,8 +754,6 @@
 				}else{
 					$("#"+$("#edit_line_target").val()).attr("marker-start", "url(#"+$(this).val()+")");
 				}
-
-				console.log("marker-start change: " + $("#"+$("#edit_line_target").val()).attr("marker-start"));
 			});
 
 			$("#edit_line_type").on("change", function(){
@@ -771,8 +763,6 @@
 				}else{
 					$("#"+$("#edit_line_target").val()).attr("stroke-dasharray", "5,5");
 				}
-
-				console.log("stroke change: " + $("#"+$("#edit_line_target").val()).attr("stroke-dasharray"));
 			});
 
 			$("#edit_line_end").on("change", function(){
@@ -782,8 +772,6 @@
 				}else{
 					$("#"+$("#edit_line_target").val()).attr("marker-end", "url(#"+$(this).val()+")");
 				}
-
-				console.log("marker-end change: " + $("#"+$("#edit_line_target").val()).attr("marker-end"));
 			});
 
 		});

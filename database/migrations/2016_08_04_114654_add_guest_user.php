@@ -12,7 +12,7 @@ class AddGuestUser extends Migration
      */
     public function up()
     {
-        DB::table("users")->insert(["email" => "guest@uml.tgauch.net", "provider_id" => 0, "username" => "UML_Guest", "access_token" => ""]);
+        DB::table("users")->insert(["email" => "guest@uml.tgauch.net", "provider_id" => 0, "username" => "UML_Guest", "access_token" => "", "provider" => "GUEST"]);
     }
 
     /**

@@ -14,8 +14,6 @@ var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 		changedItems[k++] = value.serialize(); 
 	});
 
-	console.log(UMLClasses);
-
 	postData["savedItems"] = JSON.stringify(changedItems);
 
 	if(holderObject["deletedClasses"] != undefined)
@@ -133,10 +131,10 @@ var UMLClass = function(config, createCallback = function(){}){
 			success: function(data){
 				if(data.success)
 				{	
-					console.log("created", t.className);
 					t.dbId = data.id;
 					UMLClasses["class_"+t.id] = t;
 					t.render();
+					addClassToListView(t);
 					createCallback();
 				}else{
 					alert(data.message);
@@ -242,16 +240,12 @@ UMLClass.prototype = {
 							extraAttributes += " text-decoration='underline'";
 						}
 
-						console.log(text);
-
 						uml += '<text class="umlclass-functions-text" fill="black" stroke-width="0px" x="'+x+'" y="'+y+'" '+extraAttributes+'>'+text+'</text>';
 						y+=15;
 					}).bind(this));
 				uml +='</g>'+
 			'</g>'+
 		'</svg>';
-
-		console.log(uml);
 
 		$(".umlcanvas").append(uml);
 
@@ -392,8 +386,6 @@ UMLClass.prototype = {
 			});
 			return;
 		}
-
-		console.log("Adding relationship from " + this.className + " to " + className + " of type " + type);
 
 		var emp = this.midPoint();
 		var smp = umlClass.midPoint();
@@ -536,10 +528,7 @@ UMLClass.prototype = {
 			f["isStatic"] = (value.isStatic == undefined ? false : value.isStatic);
 			f["isFinal"] = (value.isFinal == undefined ? false : value.isFinal);
 			f["isAbstract"] = (value.isAbstract == undefined ? false : value.isAbstract);
-			if(f.length < 7)
-			{
-				console.log(f);
-			}
+
 			funcs.push(f);
 		});
 
