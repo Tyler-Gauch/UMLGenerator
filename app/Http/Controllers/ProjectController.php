@@ -381,7 +381,7 @@ class ProjectController extends Controller
                $r["starting_class_id"] = $relationship->starting_class_id;
                $r["ending_class_id"] = $relationship->ending_class_id;
                $r["marker-start"] = $relationship->StartingRelationshipMarker->type;
-               $r["marker-end"] = $relationship->StartingRelationshipMarker->type;
+               $r["marker-end"] = $relationship->EndingRelationshipMarker->type;
                $r["line_type"] = $relationship->RelationshipLine->type;
                $c["relationships"]["custom"][] =$r;
             }
