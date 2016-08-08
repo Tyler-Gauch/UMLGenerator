@@ -286,7 +286,7 @@
 	      			</div>
 	      		</div>
 	      	</div>
-	      	<div class="row hidden" id="new_empty_project">
+	      	<div class="col-lg-12 hidden" id="new_empty_project"  style="padding:10px">
 	      		<div class="form-group">
 		        	<div class="col-lg-12">
 
@@ -305,7 +305,7 @@
 	      				<div class="alert alert-danger">If you would like to use a private repository from your list of repositories, please login!</div>
 	      			</div>
 	      		@endif
-		        <div class="col-lg-12">
+		        <div class="col-lg-12"  style="padding:10px">
 		        	<div class="form-group">
 		        		<div class="col-lg-4">
 		        			<label>Repository:</label>
@@ -331,16 +331,18 @@
 		        		</div>		        		
 		        	</div>
 		        </div>
-		        <div class="col-lg-12">
-		        	<div class="col-lg-4">
-		        		<label>Language</label>
-		        	</div>
-		        	<div class="col-lg-8">
-		        		<select id="new_project_language" class="form-control allow-hotkeys">
-		        			<option value="null">Please Select a Language</option>
-		        			<option value="java">JAVA</option>
-		        			<option value="php" disabled>PHP-Coming Soon</option>
-		        		</select>
+		        <div class="col-lg-12"  style="padding:10px">
+		        	<div class="form-group">
+			        	<div class="col-lg-4">
+			        		<label>Language</label>
+			        	</div>
+			        	<div class="col-lg-8">
+			        		<select id="new_project_language" class="form-control allow-hotkeys">
+			        			<option value="null">Please Select a Language</option>
+			        			<option value="java">JAVA</option>
+			        			<option value="php" disabled>PHP-Coming Soon</option>
+			        		</select>
+			        	</div>
 		        	</div>
 		        </div>
 	        </div>
@@ -500,7 +502,6 @@
 		}
 
 		function addClassToListView(umlClass){
-			console.log("Adding to list view", umlClass.id);
 			var lv = $("#list_view");
 			var html = '<div class="col-lg-12 list_view_element" data-target="class_'+umlClass.id+'" id="list_view_class_'+umlClass.id+'">'+
 							'<strong>'+umlClass.className+'</strong>'+
@@ -511,7 +512,6 @@
 
 		function removeClassFromListView(umlClassId)
 		{
-			console.log("Removing from list view", umlClassId);
 			$("#list_view_class_"+umlClassId).remove();
 		}
 
