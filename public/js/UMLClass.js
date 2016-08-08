@@ -470,6 +470,8 @@ UMLClass.prototype = {
 				{
 					path += "stroke-dasharray='5,5'";
 				}
+			}else{
+				path += " marker-end='url(#arrowLine)' marker-start='url(#arrowLine)";
 			}
 
 			path += "></path>";
