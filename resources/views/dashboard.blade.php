@@ -546,6 +546,24 @@
 							$.each(data.model, function(key, umlClass){
 								addClass(umlClass);
 							});
+
+							$.each(UMLClasses, function(key, umlClass){
+								if(umlClass.relationships["custom"] != undefined)
+								{
+									$.each(umlClass.relationships["custom"], function(key, rel){
+										var nc = null;
+										$.each(UMLClasses, function(key, nextClass){
+											if(nextClass.dbId == rel.ending_class_id)
+											{
+												nc = nextClass;
+												return;
+											}
+										});
+
+										umlClass.addRelationship(nc.className, "custom", rel);
+									});
+								}
+							});
 						}
 						callback(data.success);
 					}

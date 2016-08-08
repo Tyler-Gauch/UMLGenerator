@@ -351,7 +351,7 @@ UMLClass.prototype = {
 			return "#";
 		}
 	},
-	addRelationship: function(className, type){
+	addRelationship: function(className, type, customAttr = {}){
 		var umlClass = null;
 		$.each(UMLClasses, function(key, value){
 			if(value.className == className)
@@ -411,7 +411,7 @@ UMLClass.prototype = {
 				setClassEdited(this);
 				$path.attr("marker-start", "url(#diamondFill)");
 			}
-			return;
+			return $path;
 		}
 
 		var classes = "line";
@@ -437,13 +437,21 @@ UMLClass.prototype = {
 			}else if(type == "composite-aggregation")
 			{
 				path += " marker-end='url(#diamondFill)'";
+			}else if(type == "custom")
+			{
+				path += " marker-end='url(#"+customAttr["marker-end"]+") marker-start='url(#"+customAttr["marker-start"]+")";
+				if(customAttr["line_type"] == "dashed")
+				{
+					path += "stroke-dasharray='5,5'";
+				}
 			}
 
 			path += "></path>";
 		path += '</svg>';
 
-		$(".umlcanvas").append(path);
+		var $path = $(".umlcanvas").append(path);
 		$("#relationship_class_"+this.id+"_class_"+umlClass.id).click();
+		return $path;
 	},
 	select: function(){
 		this.selected = true;

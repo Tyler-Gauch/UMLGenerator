@@ -30,7 +30,7 @@ Route::group(["middleware" => 'auth'], function(){
 	Route::any('/{project}/load', "ProjectController@load");
 
 	Route::post("/parser/java", "ParserController@javaParser");
-	Route::get("/parser/{project}/{branch}", "ParserController@parseBranch");
+	Route::get("/parser/{project}", "ParserController@parseBranch");
 
 	Route::post("/repo/list", "DashboardController@listRepos");
 	Route::post("/branch/list", "DashboardController@listBranches");

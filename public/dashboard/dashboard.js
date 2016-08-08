@@ -291,7 +291,8 @@ $(document).ready(function(){
 	function getBranchFromGitHub(project, branch, t = null){
 		window.showLoader("Loading your project from github...");
 		$.ajax({
-			url: "/parser/"+project+"/"+branch,
+			url: "/parser/"+project,
+			data: {branch: branch},
 			method: "GET",
 			success: function(data){
 				window.hideLoader();

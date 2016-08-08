@@ -33,7 +33,14 @@ class ParserController extends Controller{
 
 	}
 
-	public function parseBranch(Request $request, $project, $branch){
+	public function parseBranch(Request $request, $project){
+
+		$branch = $request->input("branch", null);
+		if($branch == "null")
+		{
+			$branch = null;
+		}
+
 		$project = Project::where("name", "=", $project)->firstOrFail();
 
 		if($project->repo != null)

@@ -57,6 +57,7 @@ class JavaParserHelper extends ParserHelper {
 						for($this->iterator = strpos($this->fileContents, "{", $this->iterator)+1; $this->iterator < strlen($this->fileContents); $this->iterator++)
 						{
 							$this->iterator = $this->eatWhiteSpace($this->iterator);
+							$this->iterator = $this->eatComments($this->iterator);
 							switch($this->fileContents[$this->iterator])
 							{
 								case "{":
@@ -193,6 +194,30 @@ class JavaParserHelper extends ParserHelper {
 							}
 						}
 						$results["functions"][] = $func;
+
+						//now that we had a function we want to eat through all the function code to get past it.
+						$this->iterator = $this->iterator-5;
+						$braceCount = 1;
+						for($this->iterator = strpos($this->fileContents, "{", $this->iterator)+1; $this->iterator < strlen($this->fileContents); $this->iterator++)
+						{
+							$this->iterator = $this->eatWhiteSpace($this->iterator);
+							$this->iterator = $this->eatComments($this->iterator);
+							switch($this->fileContents[$this->iterator])
+							{
+								case "{":
+									$braceCount++;
+									break;
+								case "}":
+									$braceCount--;
+									break;
+							}
+
+							if($braceCount == 0){
+								$this->iterator++;
+								break;
+							}
+						}
+
 					}else if(($attributes = $this->isAttribute($nextWord)) != null){
 						foreach($attributes as $key=>$attribute)
 						{
