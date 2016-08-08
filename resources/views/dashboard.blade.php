@@ -529,6 +529,7 @@
 		}
 		@if(isset($project))
 			function loadProjectModels(branch = null, callback=function(){}){	
+				console.log("Loading Project Models");
 				var postData = {};
 				if(branch != null)
 				{
@@ -542,6 +543,7 @@
 					success: function(data){
 						if(data.success)
 						{
+							console.log("Model Loaded");
 							$("#edit_target").val("null");
 							$.each(UMLClasses, function(key, umlClass){
 								removeClassFromListView(umlClass.id);
@@ -704,7 +706,12 @@
 
 			@if(isset($project))
 				@if(isset($branches))
-					$("#edit_class_branch_list").find("a").click();
+					$("#edit_class_branch_list").find("a").each(function(){
+						if($(this).data("branch") == "master")
+						{
+							$(this).click();
+						}
+					});
 				@else
 					loadProjectModels();
 				@endif

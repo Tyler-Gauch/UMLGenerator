@@ -186,6 +186,9 @@ UMLClass.prototype = {
 					uml += '<text class="umlclass-name-text" unselectable="on" text-anchor="middle" fill="black" stroke-width="0px" x="'+(x+this.width/2)+'" y="'+(y+30)+'">'+this.className+'</text>';
 					y += nameHeight+15;
 					$.each(this.attributes, (function(key, attribute){
+						attribute.name = attribute.name.replace("<", "&lt;").replace(">", "&gt;");
+						attribute.type = attribute.type.replace("<", "&lt;").replace(">", "&gt;");
+						attribute.default = attribute.default.replace("<", "&lt;").replace(">", "&gt;");
 						if(attribute.default == null)
 						{
 							attribute.default = "";
@@ -209,6 +212,9 @@ UMLClass.prototype = {
 					}).bind(this));
 					y+=10;
 					$.each(this.functions, (function(key, func){
+						func.name = func.name.replace("<", "&lt;").replace(">", "&gt;");
+						func.parameters = func.parameters.replace("<", "&lt;").replace(">", "&gt;");
+
 						if(func.parameters.indexOf("(") != 0)
 						{
 							func.parameters = "("+func.parameters;
@@ -221,6 +227,7 @@ UMLClass.prototype = {
 						
 						if(func.type != null)
 						{
+							func.type = func.type.replace("<", "&lt;").replace(">", "&gt;");
 							text += " : "+func.type
 						}
 
@@ -230,12 +237,16 @@ UMLClass.prototype = {
 							extraAttributes += " text-decoration='underline'";
 						}
 
+						console.log(text);
+
 						uml += '<text class="umlclass-functions-text" fill="black" stroke-width="0px" x="'+x+'" y="'+y+'" '+extraAttributes+'>'+text+'</text>';
 						y+=15;
 					}).bind(this));
-				'</g>'+
+				uml +='</g>'+
 			'</g>'+
 		'</svg>';
+
+		console.log(uml);
 
 		$(".umlcanvas").append(uml);
 
@@ -355,6 +366,8 @@ UMLClass.prototype = {
 		}else if(visibility == "protected")
 		{
 			return "#";
+		}else{
+			return "~";
 		}
 	},
 	addRelationship: function(className, type, customAttr = {}){
