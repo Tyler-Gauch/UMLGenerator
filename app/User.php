@@ -42,8 +42,8 @@ class User extends Authenticatable
     private function getIdInArray($array, $term)
     {
         foreach ($array as $key => $value) {
-            if ($value == $term) {
-                return $key;
+		if ($value["name"] == $term) {
+                return $value["id"];
             }
         }
         return -1;
@@ -67,7 +67,7 @@ class User extends Authenticatable
     function hasRole($role)
     {
         Log::info("hasRole($role)");
-        foreach($this->roles as $key=>$value)
+        foreach($this->Roles as $key=>$value)
         {
             Log::info("{$value->name} == $role");
             if($value->name == $role)
