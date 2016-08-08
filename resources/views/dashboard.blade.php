@@ -503,6 +503,20 @@
 
 		function addClassToListView(umlClass){
 			var lv = $("#list_view");
+			var exists = false;
+			$.each($(".list_view_element"), function(key, value){
+				if("class_"+umlClass.id == $(this).data("target"))
+				{
+					exists = true;
+					return;
+				}
+			});
+
+			if(exists)
+			{
+				return;
+			}
+
 			var html = '<div class="col-lg-12 list_view_element" data-target="class_'+umlClass.id+'" id="list_view_class_'+umlClass.id+'">'+
 							'<strong>'+umlClass.className+'</strong>'+
 			'			</div>';
@@ -699,13 +713,17 @@
 			$(document).on("click", ".list_view_element", function(){
 				$("#"+$(this).data("target")).trigger({type: "mousedown", which:1});
 				$("#"+$(this).data("target")).mouseup();
+				UMLClasses[$(this).data["target"]].render();
 			});
 
 			@if(isset($project))
 				@if(isset($branches))
 					$("#edit_class_branch_list").find("a")[0].click();
 				@else
-					loadProjectModels();
+					loadProjectModels(function(){
+						console.log("load");
+						$(".umlcanvas").click();
+					});
 				@endif
 			@endif
 

@@ -157,6 +157,10 @@ class JavaParserHelper extends ParserHelper {
 								}
 							}
 						}
+
+						$start = strpos($parameters, "(");
+						$end = strpos($parameters, ")");
+						$parameters = substr($parameters, $start, $end-$start);
 						$parameters = preg_replace('/[\(]?+[\)]?+/', "", $parameters);
 						$parameters = explode(",", $parameters);
 						$params = "(";

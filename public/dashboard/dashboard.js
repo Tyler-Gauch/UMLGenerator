@@ -333,6 +333,9 @@ $(document).ready(function(){
 				}else{
 					alert("Error: "+data.message);
 				}
+
+				console.log("github");
+				$(".umlcanvas").click();
 			}
 		});
 	}
@@ -385,6 +388,8 @@ $(document).ready(function(){
 				t.children().each(function(){
 					$(this).addClass("fa-check");
 				});
+
+				$(".umlcanvas").click();
 			}
 		});
 	});

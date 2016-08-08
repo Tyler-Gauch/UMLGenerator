@@ -145,6 +145,7 @@ var UMLClass = function(config, createCallback = function(){}){
 		t.dbId = config.dbId;
 		UMLClasses["class_"+t.id] = t;
 		t.render();
+		addClassToListView(t);
 	}
 };
 
