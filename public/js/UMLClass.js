@@ -436,6 +436,10 @@ UMLClass.prototype = {
 			{
 				setClassEdited(this);
 				$path.attr("marker-start", "url(#diamondFill)");
+			}else if(type == "references")
+			{
+				setClassEdited(this);
+				$path.attr("marker-start", "url(#arrowLine)");
 			}
 			return $path;
 		}
@@ -470,7 +474,7 @@ UMLClass.prototype = {
 				{
 					path += "stroke-dasharray='5,5'";
 				}
-			}else{
+			}else if(type == "references"){
 				path += " marker-end='url(#arrowLine)' marker-start='url(#arrowLine)";
 			}
 
