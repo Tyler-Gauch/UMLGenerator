@@ -475,7 +475,7 @@ UMLClass.prototype = {
 					path += "stroke-dasharray='5,5'";
 				}
 			}else if(type == "references"){
-				path += " marker-end='url(#arrowLine)' marker-start='url(#arrowLine)";
+				path += " marker-end='url(#arrowLine)' marker-start='url(#arrowLine)'";
 			}
 
 			path += "></path>";
