@@ -443,7 +443,7 @@ UMLClass.prototype = {
 				path += " marker-end='url(#diamondFill)'";
 			}else if(type == "custom")
 			{
-				path += " marker-end='url(#"+customAttr["marker-end"]+") marker-start='url(#"+customAttr["marker-start"]+")";
+				path += " marker-end='url(#"+customAttr["marker-end"]+")' marker-start='url(#"+customAttr["marker-start"]+")'";
 				if(customAttr["line_type"] == "dashed")
 				{
 					path += "stroke-dasharray='5,5'";
@@ -452,7 +452,7 @@ UMLClass.prototype = {
 
 			path += "></path>";
 		path += '</svg>';
-		
+
 		var $path = $(".umlcanvas").append(path);
 		$("#relationship_class_"+this.id+"_class_"+umlClass.id).click();
 		return $path;
@@ -557,9 +557,9 @@ UMLClass.prototype = {
 			var lineType = $path.attr("stroke-dasharray");
 			if(lineType == "" || lineType == null || lineType == undefined)
 			{
-				lineType = "dashed";
-			}else{
 				lineType = "solid";
+			}else{
+				lineType = "dashed";
 			}
 
 			var rel = {};
