@@ -205,7 +205,7 @@ $(document).ready(function(){
 			postData["language"] 	= "None";
 		}else if(type == "github"){
 			postData["language"] = language;
-			if(repoName != "null")
+			if(repoName != "null" && !userIsGuest)
 			{
 				postData["repoName"] = repoName;
 			}else{
