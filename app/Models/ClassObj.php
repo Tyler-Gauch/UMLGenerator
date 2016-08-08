@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Attribute;
 use App\Models\Operation;
+use App\Models\Relationship;
 
 class ClassObj extends Model
 {
@@ -31,5 +32,11 @@ class ClassObj extends Model
     }
     public function Operations() {
         return $this->hasMany("App\\Models\\Operation", "class_id");
+    }
+    public function StartingRelationship(){
+        return $this->hasMany("App\\Models\\Relationship", "starting_class_id");
+    }
+    public function EndingRelationship(){
+        return $this->hasMany("App\\Models\\Relationship", "ending_class_id");
     }
 }

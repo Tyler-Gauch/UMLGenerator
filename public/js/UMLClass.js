@@ -14,6 +14,8 @@ var UMLClassSaveAll = function(successCB = function(){}, failCB = function(){}){
 		changedItems[k++] = value.serialize(); 
 	});
 
+	console.log(UMLClasses);
+
 	postData["savedItems"] = JSON.stringify(changedItems);
 
 	if(holderObject["deletedClasses"] != undefined)
@@ -369,6 +371,8 @@ UMLClass.prototype = {
 			return;
 		}
 
+		console.log("Adding relationship from " + this.className + " to " + className + " of type " + type);
+
 		var emp = this.midPoint();
 		var smp = umlClass.midPoint();
 		var startPoint = this.findClosestConnection(smp.x, smp.y);
@@ -448,7 +452,7 @@ UMLClass.prototype = {
 
 			path += "></path>";
 		path += '</svg>';
-
+		
 		var $path = $(".umlcanvas").append(path);
 		$("#relationship_class_"+this.id+"_class_"+umlClass.id).click();
 		return $path;

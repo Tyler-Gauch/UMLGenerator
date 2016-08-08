@@ -14,6 +14,9 @@ use App\Models\ModelObj;
 use App\Models\ClassObj;
 use App\Models\Attribute;
 use App\Models\Operation;
+use App\Models\Relationship;
+use App\Models\RelationshipLine;
+use App\Models\RelationshipMarker;
 use Carbon\Carbon;
 use Log;
 
@@ -132,7 +135,16 @@ class ProjectController extends Controller
          $currentTime = Carbon::now()->toDateTimeString();
          
          // Get the project id of the current project and add the model
-         $proj = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->firstOrFail();
+         $proj = Project::where("name", "=", $project)->where("user_id", "=", Auth::user()->id)->first();
+
+         if ($proj == null) {
+            return response()->json(["success" => false, "message" => "project not found"]);
+         }
+
+         // If the branch is null and the project is of github type, error
+         if ($branch == null && ProjectType::where("id", "=", $proj->project_type_id)->first()->name == "github") { 
+            return response()->json(["success" => false, "message" => "Github project cannot have a branch value of NULL"]);
+         }
 
          // Get the model of the github branch or NULL if empty project
          $model = ModelObj::where("project_id", "=", $proj["id"])->where("branch", "=", $branch)->firstOrCreate(
@@ -148,20 +160,25 @@ class ProjectController extends Controller
          // Loop through classes from user input
          foreach ($savedItems as $curObj) {
             Log::info("Processing Class: {$curObj['className']}");
-            $className  = $curObj["className"];
-            $locX       = $curObj["x"];  // starting x coordinate of the class 
-            $locY       = $curObj["y"];  // starting y coordinate of the class
-            $classType  = $curObj["type"];
+            $classId    = ( isset($curObj["dbId"]) ? $curObj["dbId"] : null);
+            $className  = ( isset($curObj["className"]) ? $curObj["className"] : null);
+            $locX       = ( isset($curObj["x"]) ? $curObj["x"] : 10);  // starting x coordinate of the class 
+            $locY       = ( isset($curObj["y"]) ? $curObj["y"] : 10);  // starting y coordinate of the class
+            $classType  = ( isset($curObj["type"]) ? $curObj["type"] : "class");
 
-            // Create the class in the database
-            $curClass = ClassObj::where("name", "=", $className)->where("model_id", "=", $model->id)->firstOrNew(
-               [
-               "name"      => $className,
-               "model_id"  => $model->id
-               ]
-            );
+            // The class should have already been created. If there is no ID or it doesnt belong with the model, ignore it
+            if ($classId == null || $className == null) {
+               continue;
+            }
+
+            $curClass = ClassObj::where("id", "=", $classId)->where("model_id", "=", $model->id)->first();
+
+            if ($curClass == null) {
+               continue;
+            }
 
             // Update the values
+            $curClass->name      = $className;
             $curClass->locationX = $locX;
             $curClass->locationY = $locY;
             $curClass->type      = $classType;
@@ -185,13 +202,13 @@ class ProjectController extends Controller
                   );
 
                   // Update the values
-                  $attribute->visibility  = ( isset($attr["visibility"]) ? $attr["visibility"] : "public");
-                  $attribute->type = ( isset($attr["type"]) ? $attr["type"] : ""); //constructors have no type
-                  $attribute->is_static   = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
-                  $attribute->is_final    = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
-                  $attribute->is_abstract = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
-                  $attribute->default_value = ( isset($attr["default"]) ? $attr["default"] : "");
-                  $attribute->updated_at  = $currentTime; 
+                  $attribute->visibility     = ( isset($attr["visibility"]) ? $attr["visibility"] : "public");
+                  $attribute->type           = ( isset($attr["type"]) ? $attr["type"] : ""); //constructors have no type
+                  $attribute->is_static      = ( isset($attr["isStatic"]) ? $attr["isStatic"] : false);
+                  $attribute->is_final       = ( isset($attr["isFinal"]) ? $attr["isFinal"] : false);
+                  $attribute->is_abstract    = ( isset($attr["isAbstract"]) ? $attr["isAbstract"] : false);
+                  $attribute->default_value  = ( isset($attr["default"]) ? $attr["default"] : "");
+                  $attribute->updated_at     = $currentTime; 
                   
                   // TODO default value doesnt show up right, has a colon
 
@@ -235,6 +252,34 @@ class ProjectController extends Controller
                // Now all functions saved from the user have been updated. Remove any old functions of the current class
                Operation::where("class_id", "=", $curClass->id)->where("updated_at", "<", $currentTime)->delete();
             }
+
+            if (isset($curObj["relationships"])) {
+               foreach ($curObj["relationships"] as $relation) {
+
+                  // Get the line type
+                  $line = RelationshipLine::where("type", "=", $relation["line_type"])->first();
+
+                  // Get the starting and ending marker types
+                  $startingMarker = RelationshipMarker::where("type", "=", $relation["starting_marker_type"])->first();
+                  $endingMarker   = RelationshipMarker::where("type", "=", $relation["ending_marker_type"])->first();
+
+
+                  // TODO error checking
+
+                  $relationship = Relationship::where("starting_class_id", "=", $relation["starting_class_id"])->where("ending_class_id", "=", $relation["ending_class_id"])->firstOrNew(
+                     [
+                     "starting_class_id"  => $relation["starting_class_id"],
+                     "ending_class_id"    => $relation["ending_class_id"]
+                     ]
+                  );
+
+                  $relationship->starting_marker_id = $startingMarker->id;
+                  $relationship->ending_marker_id   = $endingMarker->id;
+                  $relationship->line_id            = $line->id;
+
+                  $relationship->save();
+               }
+            }
          }
 
          // Now all classes saved from the user have been updated. Remove any old classes of the current model
@@ -256,6 +301,11 @@ class ProjectController extends Controller
             $curClass->Operations()->delete();
             $curClass->delete();
          }
+          
+         $data = [];
+         $data["success"] = true;
+
+         return response()->json($data);
       }
 
 
@@ -324,6 +374,16 @@ class ProjectController extends Controller
                $o["isFinal"] = $operation->is_final;
                $o["isabstract"] = $operation->is_abstract;
                $c["functions"][] = $o;
+            }
+            foreach($class->StartingRelationship()->get() as $relationship) 
+            {
+               $r = [];
+               $r["starting_class_id"] = $relationship->starting_class_id;
+               $r["ending_class_id"] = $relationship->ending_class_id;
+               $r["marker-start"] = $relationship->StartingRelationshipMarker->type;
+               $r["marker-end"] = $relationship->StartingRelationshipMarker->type;
+               $r["line_type"] = $relationship->RelationshipLine->type;
+               $c["relationships"]["custom"][] =$r;
             }
 
             $m[] = $c;
