@@ -9,6 +9,7 @@ $(document).on("mousedown touchstart", ".umlclass", function(e)
 	}
 	if(e.which == 1)
 	{
+		console.log("Clicked");
 		if($("#edit_target").val() != "null" && !e.ctrlKey){
 			var et = UMLClasses[$("#edit_target").val()]
 				.unselect()

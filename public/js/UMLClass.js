@@ -76,7 +76,7 @@ var UMLClassSaveChanged = function(successCB = function(){}, failCB = function()
 	});
 }
 
-var UMLClass = function(config, createCallback){
+var UMLClass = function(config, createCallback = function(){}){
 	if(config.className == null || config.className == undefined || config.className == "")
 	{
 		config.className = "Class"+UMLClassID;

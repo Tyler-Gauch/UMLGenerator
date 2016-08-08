@@ -515,17 +515,18 @@
 
 		function addClass(obj = {}){
 			console.log("adding class", obj);
-			var umlclass = new UMLClass(obj);
-			addClassToListView(umlclass);
-			$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
-			$("#class_"+umlclass.id).mouseup();
-			$("#edit_classname").focus();
-			$("#edit_classname").select();
-			$("#select").click();
-			$("#edit_form").removeClass("hidden");
-			$("#list_view").addClass("hidden");
-			$("#edit_line_form").addClass("hidden");
-			needsSave = true;
+			var umlclass = new UMLClass(obj, function(){
+				addClassToListView(umlclass);
+				$("#select").click();
+				$("#class_"+umlclass.id).trigger({type: "mousedown", which:1});
+				$("#class_"+umlclass.id).mouseup();
+				$("#edit_classname").focus();
+				$("#edit_classname").select();
+				$("#edit_form").removeClass("hidden");
+				$("#list_view").addClass("hidden");
+				$("#edit_line_form").addClass("hidden");
+				needsSave = true;
+			});
 		}
 		@if(isset($project))
 			function loadProjectModels(branch = null, callback=function(){}){	

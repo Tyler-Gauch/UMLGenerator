@@ -22,7 +22,7 @@ class ModelObj extends Model
      * @var array
      */
     protected $fillable = [
-        'branch', 'project_id'
+        'branch', 'project_id', "created"
     ];
 
     public function Classes(){
