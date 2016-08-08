@@ -292,52 +292,49 @@ $(document).ready(function(){
 
 	var numberOfClasses = 0;
 	function getBranchFromGitHub(project, branch, t = null){
-		if(confirm("Are you sure you want to reload from github? This will overwrite your current project and this is not reversible."))
-		{
-			window.showLoader("Loading your project from github...");
-			$.ajax({
-				url: "/parser/"+project,
-				data: {branch: branch},
-				method: "GET",
-				success: function(data){
-					window.hideLoader();
-					if(data.success)
-					{
-						if(t!=null){
-							$(".edit_class_branch").each(function(){
-								$(this).children().each(function(){
-									$(this).removeClass("fa-check");
-								});
+		window.showLoader("Loading your project from github...");
+		$.ajax({
+			url: "/parser/"+project,
+			data: {branch: branch},
+			method: "GET",
+			success: function(data){
+				window.hideLoader();
+				if(data.success)
+				{
+					if(t!=null){
+						$(".edit_class_branch").each(function(){
+							$(this).children().each(function(){
+								$(this).removeClass("fa-check");
 							});
-
-							t.children().each(function(){
-								$(this).addClass("fa-check");
-							});
-						}
-
-						//remove all the current classes
-						$.each(UMLClasses, function(id, umlClass){
-							umlClass.destroy();
 						});
 
-						$("#edit_target").val("null");
-
-						numberOfClasses = data.data.length;
-
-						$.each(data.data, function(key, value){
-							var umlClass = new UMLClass(value, buildRelationships);
+						t.children().each(function(){
+							$(this).addClass("fa-check");
 						});
-
-						$("#list_view").empty();					
-
-						needsSave = true;
-
-					}else{
-						alert("Error: "+data.message);
 					}
+
+					//remove all the current classes
+					$.each(UMLClasses, function(id, umlClass){
+						umlClass.destroy();
+					});
+
+					$("#edit_target").val("null");
+
+					numberOfClasses = data.data.length;
+
+					$.each(data.data, function(key, value){
+						var umlClass = new UMLClass(value, buildRelationships);
+					});
+
+					$("#list_view").empty();					
+
+					needsSave = true;
+
+				}else{
+					alert("Error: "+data.message);
 				}
-			});
-		}
+			}
+		});
 	}
 
 	function buildRelationships(){
@@ -362,7 +359,10 @@ $(document).ready(function(){
 
 	$("#force_github_load").on("click", function(e){
 		e.preventDefault();
-		getBranchFromGitHub(projectName, $("#current_branch").val());
+		if(confirm("Are you sure you want to reload from github? This will overwrite your current project and this is not reversible."))
+		{
+			getBranchFromGitHub(projectName, $("#current_branch").val());
+		}
 	});
 
 	$(".edit_class_branch").on("click", function(e){
@@ -371,7 +371,6 @@ $(document).ready(function(){
 		var t = $(this);
 		$("#current_branch").val(t.data("branch"));
 		loadProjectModels($(this).data("branch"), function(success){
-			console.log("Load: "+success);
 			if(!success)
 			{
 				getBranchFromGitHub(projectName, t.data("branch"), t);

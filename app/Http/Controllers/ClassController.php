@@ -17,7 +17,7 @@ class ClassController extends Controller
 {
    	public function create(Request $request)
    	{
-   		 $className = $request->input("className", null);
+   		    $className = $request->input("className", null);
           if($className == null)
           {
                return response()->json(["success" => false, "message" => "You must provide a class name"]);

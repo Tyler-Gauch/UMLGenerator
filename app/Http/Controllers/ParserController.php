@@ -87,6 +87,9 @@ class ParserController extends Controller{
 				$class->delete();
 			}
 
+			$model->created = true;
+			$model->save();
+
 			return response()->json($results);
 		}
 

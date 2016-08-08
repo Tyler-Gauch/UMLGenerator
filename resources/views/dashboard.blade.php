@@ -706,12 +706,7 @@
 
 			@if(isset($project))
 				@if(isset($branches))
-					$("#edit_class_branch_list").find("a").each(function(){
-						if($(this).data("branch") == "master")
-						{
-							$(this).click();
-						}
-					});
+					$("#edit_class_branch_list").find("a")[0].click();
 				@else
 					loadProjectModels();
 				@endif

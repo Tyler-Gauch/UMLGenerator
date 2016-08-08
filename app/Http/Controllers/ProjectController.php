@@ -97,7 +97,7 @@ class ProjectController extends Controller
 
          if($type == "empty")
          {
-            ModelObj::create(["branch"=> null, "project_id" => $project->id]);
+            ModelObj::create(["branch"=> null, "project_id" => $project->id, "created" => true]);
          }else if($type == "github"){
             $githubHelper = new GitHubHelper(Auth::user());
             $branches = $githubHelper->listProjectBranches($project, true);
@@ -335,6 +335,11 @@ class ProjectController extends Controller
          if($model == null)
          {
             return response()->json(["success" => false, "message" => "We were unable to get your model"]);
+         }
+
+         if(!$model->created)
+         {
+            return response()->json(["success" => false, "message" => "Model needs to be parsed from github"]);
          }
 
          //get all project information and build required data structures

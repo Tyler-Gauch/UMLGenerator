@@ -124,8 +124,10 @@ var UMLClass = function(config, createCallback){
 		config["branch"] = $("#current_branch").val();
 		config["projectId"] = projectId; //declared global in blade
 
+		var postData = {className: config.className, branch: $("#current_branch").val(), projectId: projectId};
+
 		$.ajax({
-			data: config,
+			data: postData,
 			method: "POST",
 			url: "/class/create",
 			success: function(data){
@@ -188,11 +190,14 @@ UMLClass.prototype = {
 					$.each(this.attributes, (function(key, attribute){
 						attribute.name = attribute.name.replace("<", "&lt;").replace(">", "&gt;");
 						attribute.type = attribute.type.replace("<", "&lt;").replace(">", "&gt;");
-						attribute.default = attribute.default.replace("<", "&lt;").replace(">", "&gt;");
+						
 						if(attribute.default == null)
 						{
 							attribute.default = "";
+						}else{
+							attribute.default = attribute.default.replace("<", "&lt;").replace(">", "&gt;");
 						}
+
 						var text = this.getVisibilityToken(attribute.visibility)+" "+attribute.name+" : "+attribute.type;
 						if(attribute.default != "")
 						{
